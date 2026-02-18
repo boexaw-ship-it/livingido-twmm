@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FPL Hub — Fantasy & Predictions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── CSS Variables ─────────────────────────────── */
+    :root {
+      --bg:        #0a0e1a;
+      --surface:   #111827;
+      --card:      #1a2235;
+      --border:    #1f2d45;
+      --accent:    #00d4aa;
+      --accent2:   #3b82f6;
+      --accent3:   #f59e0b;
+      --danger:    #ef4444;
+      --text:      #e2e8f0;
+      --muted:     #64748b;
+      --font-head: 'Bebas Neue', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    /* ─── Reset ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── Noise texture overlay ──────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── Navbar ─────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 64px;
+      background: rgba(10, 14, 26, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: var(--font-head);
+      font-size: 1.8rem;
+      letter-spacing: 2px;
+      color: var(--accent);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .nav-logo span {
+      color: var(--text);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 0.25rem;
+      list-style: none;
+    }
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--muted);
+      transition: all 0.2s;
+      letter-spacing: 0.3px;
+    }
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--text);
+      background: var(--card);
+    }
+    .nav-links a.active {
+      color: var(--accent);
+      border-bottom: 2px solid var(--accent);
+      border-radius: 6px 6px 0 0;
+    }
+
+    .nav-gw {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent3);
+      background: rgba(245,158,11,0.1);
+      border: 1px solid rgba(245,158,11,0.2);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+    }
+    .nav-gw::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent3);
+      animation: pulse 1.5s infinite;
+    }
+
+    /* ─── Hero ───────────────────────────────────────── */
+    .hero {
+      position: relative;
+      padding: 120px 2rem 60px;
+      text-align: center;
+      z-index: 1;
+    }
+
+    .hero-grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,170,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,170,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+    }
+
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.1s forwards;
+    }
+
+    .hero h1 {
+      font-family: var(--font-head);
+      font-size: clamp(3.5rem, 10vw, 7rem);
+      line-height: 0.95;
+      letter-spacing: 3px;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.2s forwards;
+    }
+    .hero h1 .line-accent { color: var(--accent); }
+    .hero h1 .line-dim { color: var(--muted); font-size: 0.6em; }
+
+    .hero-sub {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.3s forwards;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.4s forwards;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.75rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: all 0.25s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #0a0e1a;
+    }
+    .btn-primary:hover {
+      background: #00f0c0;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,212,170,0.3);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    /* ─── Stats Strip ────────────────────────────────── */
+    .stats-strip {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      margin: 2rem 2rem 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--surface);
+      opacity: 0;
+      animation: fadeUp 0.6s 0.5s forwards;
+      max-width: 800px;
+      margin-inline: auto;
+    }
+    .stat-item {
+      flex: 1;
+      padding: 1.25rem 1.5rem;
+      text-align: center;
+      border-right: 1px solid var(--border);
+      position: relative;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-item:hover { background: var(--card); }
+    .stat-value {
+      font-family: var(--font-head);
+      font-size: 2rem;
+      letter-spacing: 1px;
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-top: 0.25rem;
+    }
+    .stat-item.green .stat-value { color: var(--accent); }
+    .stat-item.blue .stat-value  { color: var(--accent2); }
+    .stat-item.amber .stat-value { color: var(--accent3); }
+    .stat-item.red .stat-value   { color: var(--danger); }
+
+    /* ─── Section ────────────────────────────────────── */
+    .section {
+      padding: 4rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .section-title {
+      font-family: var(--font-head);
+      font-size: 2.5rem;
+      letter-spacing: 2px;
+      line-height: 1;
+    }
+    .section-title span { color: var(--accent); }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .view-all {
+      font-size: 0.8rem;
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+      white-space: nowrap;
+    }
+    .view-all:hover { border-color: var(--accent); }
+
+    /* ─── Feature Cards ──────────────────────────────── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      text-decoration: none;
+      color: var(--text);
+      display: block;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--card-accent, var(--accent));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s;
+    }
+    .feature-card:hover {
+      border-color: var(--card-accent, var(--accent));
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+    .feature-card:hover::before { transform: scaleX(1); }
+
+    .feature-card.fantasy  { --card-accent: #00d4aa; }
+    .feature-card.predict  { --card-accent: #3b82f6; }
+    .feature-card.watch    { --card-accent: #f59e0b; }
+    .feature-card.overlay  { --card-accent: #a855f7; }
+
+    .card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .card-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+    }
+    .card-title {
+      font-family: var(--font-head);
+      font-size: 1.8rem;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+      color: var(--card-accent, var(--accent));
+    }
+    .card-desc {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 1.25rem;
+    }
+    .card-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .card-features li {
+      font-size: 0.8rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .card-features li::before {
+      content: '→';
+      color: var(--card-accent, var(--accent));
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    /* ─── Fixtures Preview ───────────────────────────── */
+    .fixtures-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .fixture-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto;
+      align-items: center;
+      gap: 1rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.5rem;
+      transition: border-color 0.2s;
+    }
+    .fixture-row:hover { border-color: var(--accent2); }
+
+    .fixture-team {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .fixture-team.away {
+      flex-direction: row-reverse;
+      text-align: right;
+    }
+    .team-badge {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .team-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .team-short {
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-family: var(--font-mono);
+    }
+
+    .fixture-vs {
+      text-align: center;
+    }
+    .vs-text {
+      font-family: var(--font-head);
+      font-size: 1.1rem;
+      color: var(--muted);
+    }
+    .fixture-time {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent3);
+      display: block;
+    }
+
+    .fixture-predict-btn {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid var(--accent2);
+      color: var(--accent2);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .fixture-predict-btn:hover {
+      background: var(--accent2);
+      color: white;
+    }
+
+    /* ─── Watch Along Teaser ─────────────────────────── */
+    .watchalong-banner {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      border: 1px solid rgba(245,158,11,0.2);
+      border-radius: 16px;
+      padding: 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+      position: relative;
+      overflow: hidden;
+    }
+    .watchalong-banner::after {
+      content: '⚽';
+      position: absolute;
+      right: -1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10rem;
+      opacity: 0.04;
+    }
+    .wb-content { flex: 1; min-width: 200px; }
+    .wb-tag {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      color: var(--accent3);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .wb-title {
+      font-family: var(--font-head);
+      font-size: 2.5rem;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+    }
+    .wb-desc {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .wb-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    /* ─── OBS Badge ──────────────────────────────────── */
+    .obs-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      background: rgba(168,85,247,0.1);
+      border: 1px solid rgba(168,85,247,0.3);
+      color: #a855f7;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .obs-badge:hover {
+      background: rgba(168,85,247,0.2);
+    }
+    .obs-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #a855f7;
+      animation: pulse 1.5s infinite;
+    }
+
+    /* ─── Footer ─────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+      position: relative;
+      z-index: 1;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ─── Scrollbar ──────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+    /* ─── Animations ─────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    /* ─── Divider ────────────────────────────────────── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0 2rem;
+    }
+
+    /* ─── Responsive ─────────────────────────────────── */
+    @media (max-width: 640px) {
+      .nav-gw { display: none; }
+      .fixture-row { grid-template-columns: 1fr auto 1fr; }
+      .fixture-predict-btn { display: none; }
+      .stats-strip { flex-wrap: wrap; }
+      .stat-item { flex: 1 1 45%; border-right: none; border-bottom: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Navbar ─────────────────────────────────────── -->
+  <nav>
+    <a href="index.html" class="nav-logo">FPL<span>HUB</span></a>
+
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">🏠 Home</a></li>
+      <li><a href="pages/fantasy.html">⚡ Fantasy</a></li>
+      <li><a href="pages/predictions.html">🎯 Predict</a></li>
+      <li><a href="pages/watchalong.html">📺 Watch Along</a></li>
+      <li><a href="overlay.html" target="_blank">🎮 OBS</a></li>
+    </ul>
+
+    <div class="nav-gw">GW 28 LIVE</div>
+  </nav>
+
+  <!-- ─── Hero ───────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-grid-bg"></div>
+    <p class="hero-eyebrow">Fantasy Premier League · 2024/25</p>
+    <h1>
+      YOUR <span class="line-accent">FPL</span><br>
+      COMMAND<br>
+      <span class="line-dim">CENTER</span>
+    </h1>
+    <p class="hero-sub">
+      Track your squad, predict match results, and watch every game with a community — all in one place.
+    </p>
+    <div class="hero-btns">
+      <a href="pages/fantasy.html" class="btn btn-primary">⚡ My Team</a>
+      <a href="pages/predictions.html" class="btn btn-ghost">🎯 Predictions GW28</a>
+      <span class="obs-badge" onclick="copyOBSLink()">
+        <span class="obs-dot"></span>
+        OBS OVERLAY
+      </span>
+    </div>
+  </section>
+
+  <!-- ─── Stats Strip ────────────────────────────────── -->
+  <div style="padding: 0 2rem; max-width:1200px; margin: 0 auto; position:relative; z-index:1;">
+    <div class="stats-strip">
+      <div class="stat-item green">
+        <div class="stat-value" id="stat-pts">68</div>
+        <div class="stat-label">GW28 Points</div>
+      </div>
+      <div class="stat-item blue">
+        <div class="stat-value" id="stat-rank">124K</div>
+        <div class="stat-label">Overall Rank</div>
+      </div>
+      <div class="stat-item amber">
+        <div class="stat-value" id="stat-correct">7/10</div>
+        <div class="stat-label">Predictions</div>
+      </div>
+      <div class="stat-item red">
+        <div class="stat-value" id="stat-tv">3</div>
+        <div class="stat-label">Transfers Left</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" style="margin-top: 3rem;" />
+
+  <!-- ─── Feature Cards ──────────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-label">// features</div>
+        <h2 class="section-title">WHAT'S <span>INSIDE</span></h2>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+
+      <a href="pages/fantasy.html" class="feature-card fantasy">
+        <span class="card-icon">⚡</span>
+        <span class="card-tag">FPL Squad</span>
+        <div class="card-title">FANTASY TEAM</div>
+        <p class="card-desc">Your squad, points, captain, and gameweek summary at a glance.</p>
+        <ul class="card-features">
+          <li>Squad formation display</li>
+          <li>Player points & stats</li>
+          <li>Captain & vice-captain</li>
+          <li>Mini-league standings</li>
+        </ul>
+      </a>
+
+      <a href="pages/predictions.html" class="feature-card predict">
+        <span class="card-icon">🎯</span>
+        <span class="card-tag">Match Predict</span>
+        <div class="card-title">PREDICTIONS</div>
+        <p class="card-desc">Predict scorelines for every fixture. Track your accuracy over the season.</p>
+        <ul class="card-features">
+          <li>GW fixtures list</li>
+          <li>Score prediction form</li>
+          <li>Result accuracy tracker</li>
+          <li>Saved to localStorage</li>
+        </ul>
+      </a>
+
+      <a href="pages/watchalong.html" class="feature-card watch">
+        <span class="card-icon">📺</span>
+        <span class="card-tag">Watch Along</span>
+        <div class="card-title">WATCH ALONG</div>
+        <p class="card-desc">Live chat, viewer polls, and match reactions — watch together in real-time.</p>
+        <ul class="card-features">
+          <li>Live comment section</li>
+          <li>Prediction poll voting</li>
+          <li>Match timeline</li>
+          <li>Hype reactions</li>
+        </ul>
+      </a>
+
+      <a href="overlay.html" target="_blank" class="feature-card overlay">
+        <span class="card-icon">🎮</span>
+        <span class="card-tag">OBS Overlay</span>
+        <div class="card-title">STREAM OVERLAY</div>
+        <p class="card-desc">Transparent overlay for OBS — show scores, predictions, and polls live on stream.</p>
+        <ul class="card-features">
+          <li>Transparent background</li>
+          <li>Score ticker</li>
+          <li>Poll results widget</li>
+          <li>?obs=true mode</li>
+        </ul>
+      </a>
+
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ─── Fixtures Preview ───────────────────────────── -->
+  <section class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-label">// gameweek 28</div>
+        <h2 class="section-title">FIXTURES <span>PREVIEW</span></h2>
+      </div>
+      <a href="pages/predictions.html" class="view-all">Predict all →</a>
+    </div>
+
+    <div class="fixtures-list" id="fixtures-list">
+      <!-- Rendered by JS -->
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ─── Watch Along Banner ────────────────────────── -->
+  <section class="section">
+    <div class="watchalong-banner">
+      <div class="wb-content">
+        <div class="wb-tag">// live session</div>
+        <div class="wb-title">WATCH ALONG</div>
+        <p class="wb-desc">
+          Join the session — chat, vote on predictions, and react to every goal live.
+          OBS overlay syncs automatically.
+        </p>
+      </div>
+      <div class="wb-actions">
+        <a href="pages/watchalong.html" class="btn btn-primary">📺 Join Now</a>
+        <a href="overlay.html?obs=true" target="_blank" class="btn btn-ghost">🎮 Open Overlay</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Footer ────────────────────────────────────── -->
+  <footer>
+    <p>FPL Hub · Built with Vanilla JS · Deployed on <a href="#">GitHub Pages</a></p>
+    <p style="margin-top:0.5rem; font-size:0.65rem;">
+      Data: Static / Hardcoded &nbsp;·&nbsp; OBS: Browser Source &nbsp;·&nbsp;
+      <span style="color:#a855f7;">?obs=true</span> for overlay mode
+    </p>
+  </footer>
+
+  <script>
+    // ─── Fixtures Data (hardcode - update each GW) ───────
+    const FIXTURES_GW28 = [
+      { home: { name: 'Arsenal',          short: 'ARS', badge: '🔴' },
+        away: { name: 'Man City',          short: 'MCI', badge: '🔵' },
+        time: 'SAT 12:30', id: 1 },
+      { home: { name: 'Liverpool',        short: 'LIV', badge: '🔴' },
+        away: { name: 'Chelsea',           short: 'CHE', badge: '🔵' },
+        time: 'SAT 15:00', id: 2 },
+      { home: { name: 'Man United',       short: 'MUN', badge: '🔴' },
+        away: { name: 'Tottenham',         short: 'TOT', badge: '⚪' },
+        time: 'SAT 17:30', id: 3 },
+      { home: { name: 'Aston Villa',      short: 'AVL', badge: '🟣' },
+        away: { name: 'Newcastle',         short: 'NEW', badge: '⚫' },
+        time: 'SUN 14:00', id: 4 },
+      { home: { name: 'Brighton',         short: 'BHA', badge: '🔵' },
+        away: { name: 'West Ham',          short: 'WHU', badge: '🔴' },
+        time: 'SUN 16:30', id: 5 },
+    ];
+
+    function renderFixtures() {
+      const container = document.getElementById('fixtures-list');
+      container.innerHTML = FIXTURES_GW28.map(f => `
+        <div class="fixture-row">
+          <div class="fixture-team home">
+            <div class="team-badge">${f.home.badge}</div>
+            <div>
+              <div class="team-name">${f.home.name}</div>
+              <div class="team-short">${f.home.short}</div>
+            </div>
+          </div>
+          <div class="fixture-vs">
+            <div class="vs-text">VS</div>
+            <span class="fixture-time">${f.time}</span>
+          </div>
+          <div class="fixture-team away">
+            <div class="team-badge">${f.away.badge}</div>
+            <div>
+              <div class="team-name">${f.away.name}</div>
+              <div class="team-short">${f.away.short}</div>
+            </div>
+          </div>
+          <button class="fixture-predict-btn" onclick="goPredict(${f.id})">PREDICT →</button>
+        </div>
+      `).join('');
+    }
+
+    function goPredict(id) {
+      window.location.href = `pages/predictions.html#fixture-${id}`;
+    }
+
+    function copyOBSLink() {
+      const url = window.location.origin + window.location.pathname.replace('index.html','') + 'overlay.html?obs=true';
+      navigator.clipboard.writeText(url).then(() => {
+        const badge = document.querySelector('.obs-badge');
+        badge.textContent = '✓ COPIED!';
+        setTimeout(() => {
+          badge.innerHTML = '<span class="obs-dot"></span> OBS OVERLAY';
+        }, 2000);
+      });
+    }
+
+    // ─── Init ────────────────────────────────────────────
+    renderFixtures();
+
+    // Animate stat counters
+    function animateCounter(el, target, suffix = '') {
+      const isK = target.includes('K');
+      const num = parseInt(target.replace(/[^0-9]/g, ''));
+      let current = 0;
+      const step = Math.ceil(num / 30);
+      const timer = setInterval(() => {
+        current = Math.min(current + step, num);
+        el.textContent = isK ? current + 'K' : (target.includes('/') ? target : current + suffix);
+        if (current >= num) clearInterval(timer);
+      }, 40);
+    }
+
+    setTimeout(() => {
+      animateCounter(document.getElementById('stat-pts'), '68');
+      animateCounter(document.getElementById('stat-rank'), '124K');
+      animateCounter(document.getElementById('stat-tv'), '3');
+    }, 600);
+  </script>
+
+</body>
+</html>
