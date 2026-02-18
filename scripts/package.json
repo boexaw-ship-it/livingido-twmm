@@ -1,0 +1,10 @@
+{
+  "name": "fpl-fetcher",
+  "version": "1.0.0",
+  "description": "FPL data fetcher for GitHub Actions",
+  "main": "fetch-fpl.js",
+  "type": "module",
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}
