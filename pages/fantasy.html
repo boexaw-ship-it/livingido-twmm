@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Fantasy Team — FPL Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#07090f;--s1:#0d1220;--s2:#111827;--s3:#162033;
+      --bd:#1a2840;--ac:#00d4aa;--bl:#3b82f6;--am:#f59e0b;
+      --dg:#ef4444;--pu:#a855f7;--gr:#22c55e;
+      --tx:#e2e8f0;--mt:#4a5f7a;
+      --fh:'Bebas Neue',sans-serif;
+      --fb:'DM Sans',sans-serif;
+      --fm:'JetBrains Mono',monospace;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{background:var(--bg);color:var(--tx);font-family:var(--fb);min-height:100vh}
+
+    /* ── Navbar ── */
+    nav{
+      position:sticky;top:0;z-index:200;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 1.25rem;height:52px;
+      background:rgba(7,9,15,.96);backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--bd);
+    }
+    .nav-logo{font-family:var(--fh);font-size:1.4rem;color:var(--ac);text-decoration:none;letter-spacing:2px}
+    .nav-logo span{color:var(--tx)}
+    .nav-links{display:flex;gap:.15rem;list-style:none}
+    .nav-links a{padding:.3rem .7rem;border-radius:5px;text-decoration:none;font-size:.75rem;font-weight:600;color:var(--mt);transition:all .2s}
+    .nav-links a:hover{color:var(--tx);background:var(--s2)}
+    .nav-links a.active{color:var(--ac);background:rgba(0,212,170,.08)}
+
+    /* ── Page ── */
+    .page{max-width:1280px;margin:0 auto;padding:1rem 1.25rem}
+
+    /* ── ID Bar ── */
+    .id-bar{
+      background:var(--s1);border:1px solid var(--bd);border-radius:10px;
+      padding:1rem 1.25rem;margin-bottom:1rem;
+      display:flex;align-items:center;gap:1rem;flex-wrap:wrap;
+    }
+    .id-bar-info{flex:1;min-width:160px}
+    .id-bar-info .lbl{font-family:var(--fm);font-size:.58rem;letter-spacing:2px;color:var(--mt);text-transform:uppercase}
+    .id-bar-info p{font-size:.72rem;color:var(--mt);margin-top:.15rem}
+    .id-bar-info p code{font-family:var(--fm);font-size:.68rem;color:var(--ac)}
+    .id-form{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+    .id-inp{background:var(--s2);border:1px solid var(--bd);border-radius:7px;padding:.45rem .8rem;color:var(--tx);font-family:var(--fm);font-size:.9rem;width:140px;outline:none;transition:border-color .2s;-moz-appearance:textfield}
+    .id-inp::-webkit-inner-spin-button{-webkit-appearance:none}
+    .id-inp:focus{border-color:var(--ac)}
+    .id-inp::placeholder{color:var(--mt)}
+    .btn-l{background:var(--ac);color:#07090f;border:none;border-radius:7px;padding:.45rem 1.2rem;font-weight:700;font-size:.82rem;cursor:pointer;transition:all .2s;white-space:nowrap}
+    .btn-l:hover{background:#00f0c0;transform:translateY(-1px)}
+    .btn-l:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .btn-d{background:transparent;color:var(--mt);border:1px solid var(--bd);border-radius:7px;padding:.4rem .8rem;font-size:.75rem;cursor:pointer;transition:all .2s}
+    .btn-d:hover{border-color:var(--am);color:var(--am)}
+
+    /* ── Status ── */
+    .sbar{display:flex;align-items:center;gap:.5rem;font-family:var(--fm);font-size:.68rem;padding:.35rem .9rem;border-radius:20px;background:var(--s2);border:1px solid var(--bd);width:fit-content;margin-bottom:1rem}
+    .sd{width:6px;height:6px;border-radius:50%}
+    .sd.idle{background:var(--mt)}.sd.loading{background:var(--am);animation:pulse 1s infinite}.sd.ok{background:var(--ac)}.sd.error{background:var(--dg)}
+
+    /* ── Summary Strip ── */
+    .sum-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:.6rem;margin-bottom:1rem}
+    .sc{background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:.9rem .75rem;text-align:center;position:relative;overflow:hidden}
+    .sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--c,var(--ac))}
+    .sv{font-family:var(--fh);font-size:1.7rem;letter-spacing:1px;line-height:1;color:var(--c,var(--ac))}
+    .sk{font-size:.58rem;color:var(--mt);text-transform:uppercase;letter-spacing:1.5px;margin-top:.25rem}
+    .sc.bl{--c:var(--bl)}.sc.am{--c:var(--am)}.sc.pu{--c:var(--pu)}.sc.dg{--c:var(--dg)}.sc.gr{--c:var(--gr)}
+
+    /* ══════════════════════════════════════
+       16:9 FRAME  1280×600 fixed
+    ══════════════════════════════════════ */
+    .frame-16-9{
+      width:100%;
+      aspect-ratio:16/9;
+      max-height:600px;
+      background:var(--s1);
+      border:1px solid var(--bd);
+      border-radius:14px;
+      overflow:hidden;
+      display:grid;
+      grid-template-columns:1fr 220px;
+      margin-bottom:1rem;
+      position:relative;
+    }
+
+    /* ── PITCH inside frame ── */
+    .pitch-col{display:flex;flex-direction:column;overflow:hidden}
+    .pitch-hdr{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:.6rem 1rem;border-bottom:1px solid var(--bd);
+      background:rgba(0,0,0,.3);flex-shrink:0;
+    }
+    .pitch-hdr-l{display:flex;align-items:center;gap:.6rem}
+    .team-name-hdr{font-family:var(--fh);font-size:1.3rem;letter-spacing:2px}
+    .formation-tag{font-family:var(--fm);font-size:.65rem;padding:.2rem .65rem;border-radius:12px;background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.2);color:var(--ac)}
+
+    .pitch{
+      flex:1;
+      background:
+        repeating-linear-gradient(
+          180deg,
+          #0a4d26 0px,#0a4d26 40px,
+          #0b5629 40px,#0b5629 80px
+        );
+      position:relative;
+      display:flex;flex-direction:column;
+      padding:.4rem .25rem;gap:.1rem;
+    }
+    /* center line */
+    .pitch::before{content:'';position:absolute;left:6%;right:6%;top:50%;height:1px;background:rgba(255,255,255,.06)}
+    /* center circle */
+    .pitch::after{content:'';position:absolute;left:50%;top:50%;width:60px;height:60px;border:1px solid rgba(255,255,255,.06);border-radius:50%;transform:translate(-50%,-50%)}
+    .p-goal{position:absolute;left:30%;right:30%;height:12px;border:1px solid rgba(255,255,255,.08)}
+    .p-goal.t{top:0;border-top:none}.p-goal.b{bottom:0;border-bottom:none}
+    .p-box-t{position:absolute;left:18%;right:18%;top:0;height:22%;border:1px solid rgba(255,255,255,.04);border-top:none}
+    .p-box-b{position:absolute;left:18%;right:18%;bottom:0;height:22%;border:1px solid rgba(255,255,255,.04);border-bottom:none}
+
+    /* ── Player Row ── */
+    .p-row{display:flex;justify-content:center;align-items:center;gap:.15rem;flex:1;position:relative;z-index:2}
+
+    /* ── Player Card ── */
+    .pc{
+      display:flex;flex-direction:column;align-items:center;gap:.15rem;
+      width:72px;cursor:pointer;position:relative;
+    }
+    .pc:hover .kit-img{transform:scale(1.1)}
+
+    .kit-wrap{position:relative;width:44px;height:44px;flex-shrink:0}
+    .kit-img{
+      width:44px;height:44px;object-fit:contain;
+      transition:transform .2s;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));
+    }
+    .kit-fallback{
+      width:44px;height:44px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-family:var(--fh);font-size:.7rem;letter-spacing:0;
+      border:2px solid rgba(255,255,255,.15);
+      background:var(--s3);color:var(--tx);
+    }
+    .badge-c,.badge-v{
+      position:absolute;top:-3px;right:-3px;
+      width:15px;height:15px;border-radius:50%;
+      font-size:.5rem;font-weight:900;
+      display:flex;align-items:center;justify-content:center;
+      border:1.5px solid var(--bg);font-family:var(--fh);z-index:3;
+    }
+    .badge-c{background:var(--am);color:#000}.badge-v{background:var(--mt);color:#fff}
+    .pts-b{
+      position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);
+      background:var(--ac);color:#07090f;
+      font-family:var(--fm);font-size:.45rem;font-weight:700;
+      padding:1px 4px;border-radius:8px;white-space:nowrap;z-index:3;
+    }
+    .pts-b.cap{background:var(--am);color:#000}
+
+    .pn{
+      font-size:.6rem;font-weight:700;text-align:center;
+      color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.9);
+      background:rgba(0,0,0,.65);padding:1px 4px;border-radius:3px;
+      line-height:1.2;max-width:70px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .pp{font-family:var(--fm);font-size:.5rem;color:rgba(255,255,255,.5)}
+
+    /* ══════════════════════════════════════
+       BENCH COLUMN inside frame
+    ══════════════════════════════════════ */
+    .bench-col{
+      border-left:1px solid var(--bd);
+      background:var(--s2);
+      display:flex;flex-direction:column;
+      overflow:hidden;
+    }
+    .bench-hdr{
+      padding:.6rem .9rem;border-bottom:1px solid var(--bd);
+      display:flex;align-items:center;justify-content:space-between;
+      flex-shrink:0;background:rgba(0,0,0,.2);
+    }
+    .bench-hdr-title{font-family:var(--fh);font-size:1.1rem;letter-spacing:2px}
+    .bench-hdr-tag{font-family:var(--fm);font-size:.58rem;padding:.2rem .6rem;border-radius:10px;background:rgba(100,116,139,.1);border:1px solid rgba(100,116,139,.2);color:var(--mt)}
+
+    .bench-list{display:flex;flex-direction:column;gap:0;flex:1;overflow:hidden}
+    .bench-item{
+      display:flex;align-items:center;gap:.6rem;
+      padding:.55rem .9rem;
+      border-bottom:1px solid rgba(255,255,255,.04);
+      cursor:pointer;transition:background .15s;flex:1;
+    }
+    .bench-item:hover{background:rgba(255,255,255,.03)}
+    .bench-item:last-child{border-bottom:none}
+    .bench-num{font-family:var(--fm);font-size:.6rem;color:var(--mt);width:14px;text-align:center;flex-shrink:0}
+    .bench-kit{width:36px;height:36px;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.4));flex-shrink:0}
+    .bench-kit-fb{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:.6rem;background:var(--s3);border:1.5px solid var(--bd);flex-shrink:0}
+    .bench-info{flex:1;min-width:0}
+    .bench-name{font-size:.78rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .bench-meta{font-family:var(--fm);font-size:.58rem;color:var(--mt);margin-top:1px}
+    .bench-pts{font-family:var(--fh);font-size:1.3rem;color:var(--ac);letter-spacing:1px;flex-shrink:0}
+
+    /* pos badge */
+    .pos-tag{font-family:var(--fm);font-size:.52rem;padding:.1rem .35rem;border-radius:3px;flex-shrink:0}
+    .pos-tag.GKP{background:rgba(250,204,21,.15);color:#facc15}
+    .pos-tag.DEF{background:rgba(0,212,170,.15);color:var(--ac)}
+    .pos-tag.MID{background:rgba(59,130,246,.15);color:var(--bl)}
+    .pos-tag.FWD{background:rgba(239,68,68,.15);color:var(--dg)}
+
+    /* ── Hot Players ── */
+    .hot-sec{margin-bottom:1.5rem}
+    .hot-hdr{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:.85rem;flex-wrap:wrap;gap:.6rem}
+    .sec-lbl{font-family:var(--fm);font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--mt);margin-bottom:.25rem}
+    .sec-ttl{font-family:var(--fh);font-size:1.8rem;letter-spacing:2px;line-height:1}
+    .sec-ttl span{color:var(--am)}
+    .hot-tabs{display:flex;gap:.35rem;flex-wrap:wrap}
+    .ht{font-family:var(--fm);font-size:.6rem;letter-spacing:1px;padding:.28rem .7rem;border-radius:16px;cursor:pointer;border:1px solid var(--bd);color:var(--mt);background:transparent;transition:all .2s}
+    .ht.active{border-color:var(--am);color:var(--am);background:rgba(245,158,11,.08)}
+
+    .hot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:.75rem}
+    .hc{background:var(--s2);border:1px solid var(--bd);border-radius:11px;padding:1rem;position:relative;overflow:hidden;transition:all .25s;cursor:pointer}
+    .hc:hover{border-color:var(--am);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.3)}
+    .hc-rank{position:absolute;top:.6rem;right:.6rem;font-family:var(--fh);font-size:2.2rem;color:rgba(255,255,255,.04);line-height:1}
+    .hc-top{display:flex;align-items:center;gap:.6rem;margin-bottom:.6rem}
+    .hc-kit{width:38px;height:38px;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.4))}
+    .hc-kit-fb{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:.7rem;background:var(--s3);border:1.5px solid var(--bd)}
+    .hc-info{}
+    .hc-name{font-size:.88rem;font-weight:700;line-height:1.2}
+    .hc-club{font-size:.65rem;color:var(--mt)}
+    .hc-stats{display:flex;flex-direction:column;gap:.35rem}
+    .hsr{display:flex;align-items:center;justify-content:space-between;font-size:.7rem}
+    .hsk{color:var(--mt)}.hsv{font-family:var(--fm);font-weight:700}
+    .hsv.fm{color:var(--am)}.hsv.pr{color:var(--ac)}.hsv.ow{color:var(--bl)}
+    .pc-up{background:rgba(0,212,170,.12);color:var(--ac);font-family:var(--fm);font-size:.58rem;padding:1px 4px;border-radius:3px}
+    .pc-dn{background:rgba(239,68,68,.12);color:var(--dg);font-family:var(--fm);font-size:.58rem;padding:1px 4px;border-radius:3px}
+    .pc-fl{background:rgba(100,116,139,.1);color:var(--mt);font-family:var(--fm);font-size:.58rem;padding:1px 4px;border-radius:3px}
+    .fdr-p{display:inline-block;width:8px;height:8px;border-radius:2px}
+    .fdr-1,.fdr-2{background:var(--ac)}.fdr-3{background:var(--am)}.fdr-4,.fdr-5{background:var(--dg)}
+
+    /* ── Tooltip ── */
+    .tt-ov{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:center;justify-content:center}
+    .tt-ov.show{display:flex}
+    .tt-box{background:var(--s2);border:1px solid var(--bd);border-radius:16px;padding:1.75rem;width:320px;max-width:92vw;position:relative}
+    .tt-x{position:absolute;top:.9rem;right:.9rem;background:none;border:none;color:var(--mt);font-size:1.1rem;cursor:pointer}
+    .tt-kit{width:64px;height:64px;object-fit:contain;display:block;margin:0 auto .65rem;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+    .tt-pos{font-family:var(--fm);font-size:.58rem;color:var(--mt);text-align:center;margin-bottom:.2rem}
+    .tt-name{font-family:var(--fh);font-size:1.7rem;letter-spacing:1px;text-align:center;margin-bottom:.1rem}
+    .tt-club{font-size:.75rem;color:var(--mt);text-align:center;margin-bottom:1.1rem}
+    .tt-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+    .tt-s{background:var(--s1);border-radius:7px;padding:.6rem;text-align:center}
+    .tt-v{font-family:var(--fh);font-size:1.4rem;letter-spacing:1px}
+    .tt-k{font-size:.58rem;color:var(--mt);text-transform:uppercase;letter-spacing:1px;margin-top:.15rem}
+
+    /* ── Animations ── */
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .fi{animation:fadeUp .3s ease both}
+
+    ::-webkit-scrollbar{width:4px}
+    ::-webkit-scrollbar-track{background:var(--bg)}
+    ::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
+
+    @media(max-width:700px){
+      .frame-16-9{grid-template-columns:1fr;aspect-ratio:auto;max-height:none}
+      .bench-col{border-left:none;border-top:1px solid var(--bd)}
+      .sum-strip{grid-template-columns:repeat(3,1fr)}
+    }
+  </style>
+</head>
+<body>
+
+<!-- Tooltip -->
+<div class="tt-ov" id="ttOv" onclick="closeTT(event)">
+  <div class="tt-box">
+    <button class="tt-x" onclick="document.getElementById('ttOv').classList.remove('show')">✕</button>
+    <img class="tt-kit" id="tt-kit-img" src="" alt="" onerror="this.style.display='none'"/>
+    <div class="tt-pos" id="tt-pos">MID</div>
+    <div class="tt-name" id="tt-name">—</div>
+    <div class="tt-club" id="tt-club">—</div>
+    <div class="tt-grid">
+      <div class="tt-s"><div class="tt-v" id="tt-gw" style="color:var(--ac)">—</div><div class="tt-k">GW Pts</div></div>
+      <div class="tt-s"><div class="tt-v" id="tt-tot" style="color:var(--bl)">—</div><div class="tt-k">Total</div></div>
+      <div class="tt-s"><div class="tt-v" id="tt-form" style="color:var(--am)">—</div><div class="tt-k">Form</div></div>
+      <div class="tt-s"><div class="tt-v" id="tt-own" style="color:var(--pu)">—</div><div class="tt-k">Owned</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Navbar -->
+<nav>
+  <a href="../index.html" class="nav-logo">FPL<span>HUB</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">🏠 Home</a></li>
+    <li><a href="fantasy.html" class="active">⚡ Fantasy</a></li>
+    <li><a href="predictions.html">🎯 Predict</a></li>
+    <li><a href="watchalong.html">📺 Watch Along</a></li>
+    <li><a href="../overlay.html" target="_blank">🎮 OBS</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+
+  <!-- ID Bar -->
+  <div class="id-bar">
+    <div class="id-bar-info">
+      <div class="lbl">// FPL Team ID</div>
+      <p>ရှာနည်း: <code>fantasy.premierleague.com → Pick Team → URL /entry/<strong>ID</strong>/</code></p>
+    </div>
+    <div class="id-form">
+      <input type="number" class="id-inp" id="teamId" placeholder="e.g. 299869" min="1"/>
+      <button class="btn-l" id="loadBtn" onclick="loadTeam()">LOAD TEAM</button>
+      <button class="btn-d" onclick="loadDemo()">Demo</button>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="sbar" id="sbar"><div class="sd idle" id="sd"></div><span id="stxt">Team ID ထည့်ပြီး Load နှိပ်ပါ</span></div>
+
+  <!-- Summary Strip -->
+  <div class="sum-strip" id="sumStrip" style="display:none">
+    <div class="sc"><div class="sv" id="s-gw">—</div><div class="sk">GW Pts</div></div>
+    <div class="sc bl"><div class="sv" id="s-tot">—</div><div class="sk">Total Pts</div></div>
+    <div class="sc am"><div class="sv" id="s-rank">—</div><div class="sk">Rank</div></div>
+    <div class="sc pu"><div class="sv" id="s-gwn">—</div><div class="sk">Gameweek</div></div>
+    <div class="sc dg"><div class="sv" id="s-tv">—</div><div class="sk">Team Value</div></div>
+    <div class="sc gr"><div class="sv" id="s-bank">—</div><div class="sk">In Bank</div></div>
+  </div>
+
+  <!-- 16:9 Frame -->
+  <div class="frame-16-9" id="frame169" style="display:none">
+
+    <!-- Pitch Column -->
+    <div class="pitch-col">
+      <div class="pitch-hdr">
+        <div class="pitch-hdr-l">
+          <div style="font-family:var(--fm);font-size:.55rem;color:var(--mt);letter-spacing:2px">// STARTING XI</div>
+          <div class="team-name-hdr" id="teamNameHdr">—</div>
+        </div>
+        <div class="formation-tag" id="formTag">—</div>
+      </div>
+      <div class="pitch" id="pitchArea">
+        <div class="p-goal t"></div>
+        <div class="p-goal b"></div>
+        <div class="p-box-t"></div>
+        <div class="p-box-b"></div>
+        <div style="display:flex;align-items:center;justify-content:center;flex:1;color:var(--mt);font-size:.8rem" id="pitchEmpty">
+          Load Team to see squad
+        </div>
+      </div>
+    </div>
+
+    <!-- Bench Column -->
+    <div class="bench-col">
+      <div class="bench-hdr">
+        <span class="bench-hdr-title">BENCH</span>
+        <span class="bench-hdr-tag">4 SUBS</span>
+      </div>
+      <div class="bench-list" id="benchList">
+        <div style="display:flex;align-items:center;justify-content:center;flex:1;color:var(--mt);font-size:.75rem;padding:1rem">
+          No bench data
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Hot Players -->
+  <div class="hot-sec" id="hotSec" style="display:none">
+    <div class="hot-hdr">
+      <div>
+        <div class="sec-lbl">// this gameweek</div>
+        <div class="sec-ttl">🔥 HOT <span>PLAYERS</span></div>
+      </div>
+      <div class="hot-tabs">
+        <button class="ht active" onclick="sortHot('form',this)">FORM</button>
+        <button class="ht" onclick="sortHot('price',this)">PRICE ▲</button>
+        <button class="ht" onclick="sortHot('own',this)">OWNERSHIP</button>
+        <button class="ht" onclick="sortHot('fdr',this)">EASY FDR</button>
+      </div>
+    </div>
+    <div class="hot-grid" id="hotGrid"></div>
+  </div>
+
+</div>
+
+<footer style="border-top:1px solid var(--bd);padding:1rem 1.25rem;text-align:center;font-size:.68rem;color:var(--mt)">
+  FPL Hub · Kit images © Premier League · <a href="../index.html" style="color:var(--ac);text-decoration:none">← Home</a>
+</footer>
+
+<script>
+// ═══════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════
+const POS      = {1:'GKP',2:'DEF',3:'MID',4:'FWD'};
+const PROXIES  = ['https://corsproxy.io/?','https://api.allorigins.win/raw?url='];
+const FPL_BASE = 'https://fantasy.premierleague.com/api';
+// FPL kit image URL pattern
+const KIT_URL  = id => `https://fantasy.premierleague.com/dist/img/shirts/standard/shirt_${id}-110.png`;
+// Fallback colors per position
+const POS_CLR  = {GKP:'#facc15',DEF:'#00d4aa',MID:'#3b82f6',FWD:'#ef4444'};
+
+let allPlayers={}, allTeams={}, hotPlayers=[];
+
+// ═══════════════════════════════════
+//  STATUS
+// ═══════════════════════════════════
+function setStatus(s,m){
+  document.getElementById('sd').className=`sd ${s}`;
+  document.getElementById('stxt').textContent=m;
+}
+
+// ═══════════════════════════════════
+//  FETCH WITH PROXY
+// ═══════════════════════════════════
+async function fplFetch(path){
+  const url=`${FPL_BASE}${path}`;
+  for(const p of PROXIES){
+    try{const r=await fetch(p+encodeURIComponent(url));if(r.ok)return r.json();}catch(e){}
+  }
+  throw new Error('Proxies failed');
+}
+
+// ═══════════════════════════════════
+//  KIT IMAGE ELEMENT
+//  FPL kit id = team_code (not team id)
+// ═══════════════════════════════════
+function kitImg(teamCode, pos, cls='kit-img', size=44){
+  // GK kit: shirt id = teamCode * 10 + 1 (usually)
+  // Outfield: teamCode * 10 (approx)
+  // Actual FPL kit IDs — use element type to pick right shirt
+  const isGK = pos === 'GKP';
+  // FPL uses shirt_{code}-110.png for outfield, shirt_{code}_1-110.png for GK
+  const img = document.createElement('img');
+  img.className = cls;
+  img.style.width = size+'px';
+  img.style.height = size+'px';
+  img.style.objectFit = 'contain';
+  img.alt = pos;
+  // Try outfield first, fallback to GK variant
+  const primary = `https://fantasy.premierleague.com/dist/img/shirts/standard/shirt_${teamCode}${isGK?'_1':''}-110.png`;
+  img.src = primary;
+  img.onerror = function(){
+    // fallback: colored circle
+    const fb = document.createElement('div');
+    fb.className = cls === 'kit-img' ? 'kit-fallback' : (cls === 'bench-kit' ? 'bench-kit-fb' : 'hc-kit-fb');
+    fb.style.background = POS_CLR[pos]+'22';
+    fb.style.borderColor = POS_CLR[pos]+'44';
+    fb.style.color = POS_CLR[pos];
+    fb.style.width = size+'px';
+    fb.style.height = size+'px';
+    fb.textContent = pos.slice(0,1);
+    this.parentNode && this.parentNode.replaceChild(fb, this);
+  };
+  return img;
+}
+
+// ═══════════════════════════════════
+//  LOAD BOOTSTRAP
+// ═══════════════════════════════════
+async function loadBootstrap(){
+  const data = await fplFetch('/bootstrap-static/');
+  data.elements.forEach(p=>{ allPlayers[p.id]=p; });
+  data.teams.forEach(t=>{ allTeams[t.id]=t; });
+
+  // Build hot players
+  hotPlayers = data.elements
+    .filter(p=>p.minutes>90 && parseFloat(p.form)>0)
+    .map(p=>({
+      id:p.id, name:p.web_name,
+      pos: POS[p.element_type],
+      teamCode: allTeams[p.team]?.code || 1,
+      teamFull: allTeams[p.team]?.name || '',
+      teamShort: allTeams[p.team]?.short_name || '',
+      form: parseFloat(p.form)||0,
+      price: p.now_cost/10,
+      priceChange: p.cost_change_event/10,
+      own: parseFloat(p.selected_by_percent)||0,
+      gwPts: p.event_points||0,
+      totalPts: p.total_points||0,
+      nextFDR: 3,
+    }));
+  return data;
+}
+
+// ═══════════════════════════════════
+//  LOAD TEAM
+// ═══════════════════════════════════
+async function loadTeam(){
+  const id = document.getElementById('teamId').value.trim();
+  if(!id){setStatus('error','Team ID ထည့်ပါ');return;}
+  const btn=document.getElementById('loadBtn');
+  btn.disabled=true; btn.textContent='Loading…';
+  try{
+    setStatus('loading','Player database ဆွဲနေသည်…');
+    await loadBootstrap();
+    setStatus('loading','Team info ဆွဲနေသည်…');
+    const entry = await fplFetch(`/entry/${id}/`);
+    const gw = entry.current_event;
+    setStatus('loading',`GW${gw} picks ဆွဲနေသည်…`);
+    const picks = await fplFetch(`/entry/${id}/event/${gw}/picks/`);
+    renderSummary(entry, picks, gw);
+    renderPitch(picks.picks, entry.name);
+    renderHot('form');
+    document.getElementById('sumStrip').style.display='grid';
+    document.getElementById('frame169').style.display='grid';
+    document.getElementById('hotSec').style.display='block';
+    setStatus('ok',`✓ ${entry.name} · GW${gw} · ${picks.entry_history?.points||0}pts`);
+    localStorage.setItem('fplTeamId', id);
+  }catch(e){
+    setStatus('error',`Failed: ${e.message} — Demo ကြိုးစားပါ`);
+  }finally{
+    btn.disabled=false; btn.textContent='LOAD TEAM';
+  }
+}
+
+// ═══════════════════════════════════
+//  SUMMARY
+// ═══════════════════════════════════
+function renderSummary(entry, picks, gw){
+  document.getElementById('s-gw').textContent  = picks.entry_history?.points??'—';
+  document.getElementById('s-tot').textContent = entry.summary_overall_points?.toLocaleString()??'—';
+  const r=entry.summary_overall_rank;
+  document.getElementById('s-rank').textContent = r?(r>=1000?Math.round(r/1000)+'K':r):'—';
+  document.getElementById('s-gwn').textContent  = `GW${gw}`;
+  const tv=picks.entry_history?.value||0;
+  const bk=picks.entry_history?.bank||0;
+  document.getElementById('s-tv').textContent   = tv?`£${(tv/10).toFixed(1)}m`:'—';
+  document.getElementById('s-bank').textContent = bk?`£${(bk/10).toFixed(1)}m`:'—';
+}
+
+// ═══════════════════════════════════
+//  RENDER PITCH
+// ═══════════════════════════════════
+function renderPitch(picks, teamName){
+  const starters = picks.filter(p=>p.position<=11);
+  const bench    = picks.filter(p=>p.position>11).sort((a,b)=>a.position-b.position);
+
+  // Formation
+  const defs=starters.filter(p=>POS[allPlayers[p.element]?.element_type]==='DEF').length;
+  const mids=starters.filter(p=>POS[allPlayers[p.element]?.element_type]==='MID').length;
+  const fwds=starters.filter(p=>POS[allPlayers[p.element]?.element_type]==='FWD').length;
+  document.getElementById('formTag').textContent    = `${defs}-${mids}-${fwds}`;
+  document.getElementById('teamNameHdr').textContent = teamName.toUpperCase();
+
+  const rows = {
+    FWD: starters.filter(p=>POS[allPlayers[p.element]?.element_type]==='FWD'),
+    MID: starters.filter(p=>POS[allPlayers[p.element]?.element_type]==='MID'),
+    DEF: starters.filter(p=>POS[allPlayers[p.element]?.element_type]==='DEF'),
+    GKP: starters.filter(p=>POS[allPlayers[p.element]?.element_type]==='GKP'),
+  };
+
+  const pitch=document.getElementById('pitchArea');
+  document.getElementById('pitchEmpty').style.display='none';
+  pitch.querySelectorAll('.p-row').forEach(r=>r.remove());
+
+  ['FWD','MID','DEF','GKP'].forEach(pos=>{
+    if(!rows[pos].length) return;
+    const row=document.createElement('div'); row.className='p-row';
+    rows[pos].forEach(pick=>{
+      const pl=allPlayers[pick.element]; if(!pl) return;
+      row.appendChild(makePlayerCard(pl, pick, pos));
+    });
+    pitch.appendChild(row);
+  });
+
+  renderBench(bench);
+}
+
+// ═══════════════════════════════════
+//  PLAYER CARD
+// ═══════════════════════════════════
+function makePlayerCard(pl, pick, pos){
+  const tc   = allTeams[pl.team];
+  const code = tc?.code || 1;
+  const isCap= pick.is_captain;
+  const isVC = pick.is_vice_captain;
+  const pts  = pl.event_points||0;
+  const disPts = pts*(pick.multiplier||1);
+
+  const card=document.createElement('div'); card.className='pc';
+  card.onclick=()=>showTT(pl, pick, code, pos);
+
+  // Kit wrap
+  const kw=document.createElement('div'); kw.className='kit-wrap';
+  kw.appendChild(kitImg(code, pos, 'kit-img', 44));
+  if(isCap){const b=document.createElement('div');b.className='badge-c';b.textContent='C';kw.appendChild(b);}
+  if(isVC) {const b=document.createElement('div');b.className='badge-v';b.textContent='V';kw.appendChild(b);}
+  const pb=document.createElement('div');
+  pb.className='pts-b'+(isCap?' cap':'');
+  pb.textContent=disPts+'pts';
+  kw.appendChild(pb);
+  card.appendChild(kw);
+
+  const nm=document.createElement('div'); nm.className='pn'; nm.textContent=pl.web_name;
+  const pr=document.createElement('div'); pr.className='pp'; pr.textContent='£'+(pl.now_cost/10).toFixed(1)+'m';
+  card.appendChild(nm); card.appendChild(pr);
+  return card;
+}
+
+// ═══════════════════════════════════
+//  BENCH
+// ═══════════════════════════════════
+function renderBench(bench){
+  const list=document.getElementById('benchList');
+  list.innerHTML='';
+  bench.forEach((pick,i)=>{
+    const pl=allPlayers[pick.element]; if(!pl) return;
+    const pos=POS[pl.element_type];
+    const code=allTeams[pl.team]?.code||1;
+    const pts=pl.event_points||0;
+
+    const item=document.createElement('div'); item.className='bench-item';
+    item.onclick=()=>showTT(pl, pick, code, pos);
+
+    const num=document.createElement('div'); num.className='bench-num'; num.textContent=i+1;
+    const kit=kitImg(code, pos, 'bench-kit', 36);
+
+    const info=document.createElement('div'); info.className='bench-info';
+    const nm=document.createElement('div'); nm.className='bench-name'; nm.textContent=pl.web_name;
+    const mt=document.createElement('div'); mt.className='bench-meta';
+    mt.innerHTML=`<span class="pos-tag ${pos}">${pos}</span> ${allTeams[pl.team]?.short_name||'?'} · £${(pl.now_cost/10).toFixed(1)}m`;
+    info.appendChild(nm); info.appendChild(mt);
+
+    const ptsEl=document.createElement('div'); ptsEl.className='bench-pts'; ptsEl.textContent=pts;
+
+    item.appendChild(num); item.appendChild(kit); item.appendChild(info); item.appendChild(ptsEl);
+    list.appendChild(item);
+  });
+}
+
+// ═══════════════════════════════════
+//  TOOLTIP
+// ═══════════════════════════════════
+function showTT(pl, pick, code, pos){
+  const isCap=pick?.is_captain;
+  const tc=allTeams[pl.team];
+  document.getElementById('tt-pos').textContent  = `${pos} · ${tc?.short_name||'?'}${isCap?' · ©':''}`;
+  document.getElementById('tt-name').textContent = pl.web_name;
+  document.getElementById('tt-club').textContent = `${tc?.name||''} · £${(pl.now_cost/10).toFixed(1)}m`;
+  document.getElementById('tt-gw').textContent   = pl.event_points||0;
+  document.getElementById('tt-tot').textContent  = pl.total_points||0;
+  document.getElementById('tt-form').textContent = pl.form||'—';
+  document.getElementById('tt-own').textContent  = (pl.selected_by_percent||'—')+'%';
+  const kitEl=document.getElementById('tt-kit-img');
+  kitEl.style.display='block';
+  kitEl.src=`https://fantasy.premierleague.com/dist/img/shirts/standard/shirt_${code}${pos==='GKP'?'_1':''}-110.png`;
+  kitEl.onerror=()=>{ kitEl.style.display='none'; };
+  document.getElementById('ttOv').classList.add('show');
+}
+function closeTT(e){ if(e.target.id==='ttOv') document.getElementById('ttOv').classList.remove('show'); }
+
+// ═══════════════════════════════════
+//  HOT PLAYERS
+// ═══════════════════════════════════
+function sortHot(key,btn){
+  document.querySelectorAll('.ht').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderHot(key);
+}
+function renderHot(key){
+  let s=[...hotPlayers];
+  if(key==='form')  s.sort((a,b)=>b.form-a.form);
+  if(key==='price') s.sort((a,b)=>b.priceChange-a.priceChange);
+  if(key==='own')   s.sort((a,b)=>b.own-a.own);
+  if(key==='fdr')   s.sort((a,b)=>a.nextFDR-b.nextFDR);
+  const grid=document.getElementById('hotGrid'); grid.innerHTML='';
+  s.slice(0,8).forEach((p,i)=>{
+    const pcCls=p.priceChange>0?'pc-up':p.priceChange<0?'pc-dn':'pc-fl';
+    const pcTxt=p.priceChange>0?`▲+£${p.priceChange.toFixed(1)}m`:p.priceChange<0?`▼£${Math.abs(p.priceChange).toFixed(1)}m`:'= 0';
+    const card=document.createElement('div'); card.className='hc fi'; card.style.animationDelay=`${i*.04}s`;
+    const kit=kitImg(p.teamCode, p.pos, 'hc-kit', 38);
+    card.innerHTML=`<div class="hc-rank">${i+1}</div>`;
+    const top=document.createElement('div'); top.className='hc-top';
+    top.appendChild(kit);
+    top.innerHTML+=`<div class="hc-info"><div class="hc-name">${p.name}</div><div class="hc-club">${p.teamFull} <span class="pos-tag ${p.pos}" style="margin-left:4px">${p.pos}</span></div></div>`;
+    card.appendChild(top);
+    card.innerHTML+=`
+      <div class="hc-stats">
+        <div class="hsr"><span class="hsk">Form (5GW)</span><span class="hsv fm">${p.form.toFixed(1)}</span></div>
+        <div class="hsr"><span class="hsk">Price</span><span class="hsv pr">£${p.price.toFixed(1)}m <span class="${pcCls}">${pcTxt}</span></span></div>
+        <div class="hsr"><span class="hsk">Ownership</span><span class="hsv ow">${p.own.toFixed(1)}%</span></div>
+        <div class="hsr"><span class="hsk">Next FDR</span><span class="hsv"><span class="fdr-p fdr-${p.nextFDR}"></span> ${['','Very Easy','Easy','Medium','Hard','Very Hard'][p.nextFDR]||'—'}</span></div>
+        <div class="hsr"><span class="hsk">GW Pts</span><span class="hsv" style="color:var(--ac)">${p.gwPts}</span></div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════
+//  DEMO MODE
+// ═══════════════════════════════════
+function loadDemo(){
+  // We need bootstrap for team codes — load it silently
+  setStatus('loading','Demo data ဆွဲနေသည်…');
+  loadBootstrap().then(()=>{
+    setStatus('ok','✓ Demo Mode — GANGJA GW26');
+    document.getElementById('s-gw').textContent  ='43';
+    document.getElementById('s-tot').textContent ='1,453';
+    document.getElementById('s-rank').textContent='1012K';
+    document.getElementById('s-gwn').textContent ='GW26';
+    document.getElementById('s-tv').textContent  ='£99.0m';
+    document.getElementById('s-bank').textContent='£0.4m';
+    document.getElementById('sumStrip').style.display='grid';
+    document.getElementById('frame169').style.display='grid';
+    document.getElementById('hotSec').style.display='block';
+    document.getElementById('formTag').textContent    ='3-4-3';
+    document.getElementById('teamNameHdr').textContent='GANGJA';
+    document.getElementById('pitchEmpty').style.display='none';
+
+    // Demo picks using real team codes from bootstrap
+    const getCode = name => {
+      const t=Object.values(allTeams).find(t=>t.name.includes(name)||t.short_name===name);
+      return t?.code||1;
+    };
+    const demoSquad={
+      FWD:[
+        {name:'João Pedro',teamName:'Brighton', pos:'FWD',pts:10,price:'£7.7m',cap:false,vc:false},
+        {name:'Gyökeres',  teamName:'Man City',  pos:'FWD',pts:8, price:'£8.6m',cap:false,vc:true},
+        {name:'Haaland',   teamName:'Man City',  pos:'FWD',pts:6, price:'£14.9m',cap:true, vc:false},
+      ],
+      MID:[
+        {name:'Rogers',   teamName:'Leicester',pos:'MID',pts:8,price:'£7.4m',cap:false,vc:false},
+        {name:'Rice',     teamName:'Arsenal',  pos:'MID',pts:6,price:'£7.6m',cap:false,vc:false},
+        {name:'Enzo',     teamName:'Chelsea',  pos:'MID',pts:4,price:'£6.9m',cap:false,vc:false},
+        {name:'Anderson', teamName:'West Ham', pos:'MID',pts:2,price:'£5.4m',cap:false,vc:false},
+      ],
+      DEF:[
+        {name:'Guehi',     teamName:'Crystal Palace',pos:'DEF',pts:7,price:'£5.3m',cap:false,vc:false},
+        {name:'Van de Ven',teamName:'Tottenham',     pos:'DEF',pts:5,price:'£4.6m',cap:false,vc:false},
+        {name:'J.Timber',  teamName:'Arsenal',       pos:'DEF',pts:5,price:'£6.4m',cap:false,vc:false},
+      ],
+      GKP:[
+        {name:'Pickford',teamName:'Everton',pos:'GKP',pts:1,price:'£5.6m',cap:false,vc:false},
+      ],
+    };
+    const benchData=[
+      {name:'Kelleher',    teamName:'Liverpool',pos:'GKP',pts:2,price:'£4.6m'},
+      {name:'Garner',      teamName:'Fulham',   pos:'MID',pts:2,price:'£5.2m'},
+      {name:'Mukiele',     teamName:'Nott\'m Forest',pos:'DEF',pts:2,price:'£4.6m'},
+      {name:'Gudmundsson', teamName:'Leicester',pos:'DEF',pts:0,price:'£3.8m'},
+    ];
+
+    const pitch=document.getElementById('pitchArea');
+    pitch.querySelectorAll('.p-row').forEach(r=>r.remove());
+
+    ['FWD','MID','DEF','GKP'].forEach(pos=>{
+      const row=document.createElement('div'); row.className='p-row';
+      demoSquad[pos].forEach(p=>{
+        const code=getCode(p.teamName);
+        const card=document.createElement('div'); card.className='pc';
+        card.onclick=()=>{
+          document.getElementById('tt-pos').textContent=p.pos;
+          document.getElementById('tt-name').textContent=p.name;
+          document.getElementById('tt-club').textContent=p.teamName+' · '+p.price;
+          document.getElementById('tt-gw').textContent=p.pts;
+          document.getElementById('tt-tot').textContent='—';
+          document.getElementById('tt-form').textContent='—';
+          document.getElementById('tt-own').textContent='—';
+          const ki=document.getElementById('tt-kit-img');
+          ki.style.display='block';
+          ki.src=`https://fantasy.premierleague.com/dist/img/shirts/standard/shirt_${code}${pos==='GKP'?'_1':''}-110.png`;
+          document.getElementById('ttOv').classList.add('show');
+        };
+        const kw=document.createElement('div'); kw.className='kit-wrap';
+        kw.appendChild(kitImg(code,pos,'kit-img',44));
+        if(p.cap){const b=document.createElement('div');b.className='badge-c';b.textContent='C';kw.appendChild(b);}
+        if(p.vc) {const b=document.createElement('div');b.className='badge-v';b.textContent='V';kw.appendChild(b);}
+        const pb=document.createElement('div');pb.className='pts-b'+(p.cap?' cap':'');pb.textContent=(p.cap?p.pts*2:p.pts)+'pts';kw.appendChild(pb);
+        card.appendChild(kw);
+        const nm=document.createElement('div');nm.className='pn';nm.textContent=p.name;
+        const pr=document.createElement('div');pr.className='pp';pr.textContent=p.price;
+        card.appendChild(nm); card.appendChild(pr);
+        row.appendChild(card);
+      });
+      pitch.appendChild(row);
+    });
+
+    // Bench
+    const bl=document.getElementById('benchList'); bl.innerHTML='';
+    benchData.forEach((p,i)=>{
+      const code=getCode(p.teamName);
+      const item=document.createElement('div'); item.className='bench-item';
+      item.onclick=()=>{
+        document.getElementById('tt-pos').textContent=p.pos;
+        document.getElementById('tt-name').textContent=p.name;
+        document.getElementById('tt-club').textContent=p.teamName+' · '+p.price;
+        document.getElementById('tt-gw').textContent=p.pts;
+        document.getElementById('tt-tot').textContent='—';
+        document.getElementById('tt-form').textContent='—';
+        document.getElementById('tt-own').textContent='—';
+        const ki=document.getElementById('tt-kit-img');
+        ki.style.display='block';
+        ki.src=`https://fantasy.premierleague.com/dist/img/shirts/standard/shirt_${code}${p.pos==='GKP'?'_1':''}-110.png`;
+        document.getElementById('ttOv').classList.add('show');
+      };
+      const num=document.createElement('div');num.className='bench-num';num.textContent=i+1;
+      const kit=kitImg(code,p.pos,'bench-kit',36);
+      const info=document.createElement('div');info.className='bench-info';
+      info.innerHTML=`<div class="bench-name">${p.name}</div><div class="bench-meta"><span class="pos-tag ${p.pos}">${p.pos}</span> ${p.teamName} · ${p.price}</div>`;
+      const ptsEl=document.createElement('div');ptsEl.className='bench-pts';ptsEl.textContent=p.pts;
+      item.appendChild(num);item.appendChild(kit);item.appendChild(info);item.appendChild(ptsEl);
+      bl.appendChild(item);
+    });
+
+    renderHot('form');
+  }).catch(e=>{
+    setStatus('error','Demo load failed: '+e.message);
+  });
+}
+
+// ── Init ──────────────────────────
+window.addEventListener('DOMContentLoaded',()=>{
+  const saved=localStorage.getItem('fplTeamId');
+  if(saved){document.getElementById('teamId').value=saved;setStatus('idle',`Last: ${saved} — Load နှိပ်ပါ`);}
+  document.getElementById('teamId').addEventListener('keydown',e=>{if(e.key==='Enter')loadTeam();});
+});
+</script>
+</body>
+</html>
