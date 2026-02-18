@@ -1,0 +1,96 @@
+name: FPL Data Auto-Fetch
+
+on:
+  # ── Auto: every hour ─────────────────────────────
+  schedule:
+    - cron: '0 * * * *'
+
+  # ── Manual trigger from Actions tab ─────────────
+  workflow_dispatch:
+    inputs:
+      force_update:
+        description: 'Force update even if no changes'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+      team_id_override:
+        description: 'Override FPL Team ID (optional)'
+        required: false
+        default: ''
+        type: string
+
+  # ── Auto: on push to these files ────────────────
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fetch-fpl.yml'
+      - 'scripts/fetch-fpl.js'
+      - 'scripts/package.json'
+
+jobs:
+  fetch-fpl-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      # ── 1. Checkout ────────────────────────────────
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── 2. Node.js setup ───────────────────────────
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # ── 3. Install deps ────────────────────────────
+      - name: Install dependencies
+        run: |
+          cd scripts
+          npm install
+
+      # ── 4. Fetch FPL data ──────────────────────────
+      - name: Fetch FPL data
+        run: node scripts/fetch-fpl.js
+        env:
+          FPL_TEAM_ID: ${{ github.event.inputs.team_id_override || secrets.FPL_TEAM_ID }}
+
+      # ── 5. Check for changes ───────────────────────
+      - name: Check for changes
+        id: changes
+        run: |
+          git diff --quiet data/cache.json \
+            || echo "changed=true" >> $GITHUB_OUTPUT
+
+      # ── 6. Commit if changed (or forced) ──────────
+      - name: Commit updated cache
+        if: steps.changes.outputs.changed == 'true' || github.event.inputs.force_update == 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/cache.json
+          git commit -m "chore: auto-update FPL cache [$(date -u '+%Y-%m-%d %H:%M UTC')]"
+          git push
+
+      # ── 7. No changes ──────────────────────────────
+      - name: No changes detected
+        if: steps.changes.outputs.changed != 'true' && github.event.inputs.force_update != 'true'
+        run: |
+          echo "✅ cache.json is already up to date."
+          echo "💡 Tip: Use force_update=true to force a commit."
+
+      # ── 8. Job Summary ─────────────────────────────
+      - name: Job summary
+        if: always()
+        run: |
+          echo "## FPL Fetch Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Trigger:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Time (UTC):** $(date -u '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_STEP_SUMMARY
+          echo "- **Force update:** ${{ github.event.inputs.force_update || 'false' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Changed:** ${{ steps.changes.outputs.changed || 'false' }}" >> $GITHUB_STEP_SUMMARY
