@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fantasy Team — FPL Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:       #0a0e1a;
+      --surface:  #111827;
+      --card:     #1a2235;
+      --border:   #1f2d45;
+      --accent:   #00d4aa;
+      --accent2:  #3b82f6;
+      --accent3:  #f59e0b;
+      --danger:   #ef4444;
+      --purple:   #a855f7;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --font-head:'Bebas Neue', sans-serif;
+      --font-body:'DM Sans', sans-serif;
+      --font-mono:'JetBrains Mono', monospace;
+
+      /* FDR Colors */
+      --fdr1: #00d4aa;
+      --fdr2: #86efac;
+      --fdr3: #f59e0b;
+      --fdr4: #f97316;
+      --fdr5: #ef4444;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+    }
+
+    /* ── Navbar ─────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 60px;
+      background: rgba(10,14,26,0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-family: var(--font-head); font-size: 1.6rem; color: var(--accent); text-decoration: none; }
+    .nav-logo span { color: var(--text); }
+    .nav-links { display: flex; gap: 0.25rem; list-style: none; }
+    .nav-links a {
+      padding: 0.4rem 0.9rem; border-radius: 6px; text-decoration: none;
+      font-size: 0.82rem; font-weight: 500; color: var(--muted); transition: all 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--accent); background: var(--card); }
+
+    /* ── Page Layout ────────────────────────────── */
+    .page { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+    /* ── Section Label ──────────────────────────── */
+    .label {
+      font-family: var(--font-mono); font-size: 0.65rem;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+    .section-title {
+      font-family: var(--font-head); font-size: 2rem;
+      letter-spacing: 2px; line-height: 1;
+    }
+    .section-title span { color: var(--accent); }
+
+    /* ── ID Input Section ───────────────────────── */
+    .id-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .id-info { flex: 1; min-width: 200px; }
+    .id-info p { font-size: 0.85rem; color: var(--muted); margin-top: 0.3rem; line-height: 1.5; }
+    .id-form { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
+    .id-input {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.6rem 1rem;
+      color: var(--text); font-family: var(--font-mono); font-size: 1rem;
+      width: 160px; transition: border-color 0.2s; outline: none;
+    }
+    .id-input:focus { border-color: var(--accent); }
+    .id-input::placeholder { color: var(--muted); }
+    .btn-load {
+      background: var(--accent); color: #0a0e1a;
+      border: none; border-radius: 8px; padding: 0.6rem 1.5rem;
+      font-weight: 700; font-size: 0.9rem; cursor: pointer;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-load:hover { background: #00f0c0; transform: translateY(-1px); }
+    .btn-load:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-demo {
+      background: transparent; color: var(--muted);
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 0.6rem 1rem; font-size: 0.8rem; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-demo:hover { border-color: var(--accent3); color: var(--accent3); }
+
+    /* ── Status ─────────────────────────────────── */
+    .status-bar {
+      display: flex; align-items: center; gap: 0.6rem;
+      font-family: var(--font-mono); font-size: 0.72rem;
+      padding: 0.4rem 1rem; border-radius: 20px;
+      background: var(--card); border: 1px solid var(--border);
+      width: fit-content; margin-bottom: 2rem;
+    }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .status-dot.idle    { background: var(--muted); }
+    .status-dot.loading { background: var(--accent3); animation: pulse 1s infinite; }
+    .status-dot.ok      { background: var(--accent); }
+    .status-dot.error   { background: var(--danger); }
+
+    /* ── Summary Cards ──────────────────────────── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .sum-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem;
+      text-align: center;
+    }
+    .sum-val {
+      font-family: var(--font-head); font-size: 2.2rem;
+      letter-spacing: 1px; line-height: 1;
+    }
+    .sum-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 0.3rem; }
+    .sum-card.green .sum-val { color: var(--accent); }
+    .sum-card.blue .sum-val  { color: var(--accent2); }
+    .sum-card.amber .sum-val { color: var(--accent3); }
+    .sum-card.purple .sum-val{ color: var(--purple); }
+    .sum-card.red .sum-val   { color: var(--danger); }
+
+    /* ── Main Grid: Pitch + Bench ───────────────── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+
+    /* ── Pitch ──────────────────────────────────── */
+    .pitch-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+    .pitch-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .pitch-title { font-family: var(--font-head); font-size: 1.4rem; letter-spacing: 1px; }
+    .formation-badge {
+      font-family: var(--font-mono); font-size: 0.75rem;
+      padding: 0.3rem 0.8rem; border-radius: 20px;
+      background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.3);
+      color: var(--accent);
+    }
+
+    .pitch {
+      background:
+        linear-gradient(180deg,
+          #0d4f2a 0%, #0f5c30 8%, #0d4f2a 8%,
+          #0d4f2a 16%, #0f5c30 16%, #0d4f2a 24%,
+          #0d4f2a 32%, #0f5c30 32%, #0d4f2a 40%,
+          #0d4f2a 48%, #0f5c30 48%, #0d4f2a 56%,
+          #0d4f2a 64%, #0f5c30 64%, #0d4f2a 72%,
+          #0d4f2a 80%, #0f5c30 80%, #0d4f2a 88%,
+          #0d4f2a 96%, #0f5c30 96%);
+      position: relative;
+      padding: 1.5rem 1rem;
+      min-height: 520px;
+      display: flex; flex-direction: column;
+    }
+
+    /* pitch markings */
+    .pitch::before {
+      content: '';
+      position: absolute;
+      left: 50%; top: 0; bottom: 0;
+      width: 1px;
+      background: rgba(255,255,255,0.07);
+      transform: translateX(-50%);
+    }
+    .pitch::after {
+      content: '';
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 80px; height: 80px;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* pitch lines */
+    .pitch-line {
+      position: absolute;
+      left: 10%; right: 10%;
+      height: 1px;
+      background: rgba(255,255,255,0.07);
+    }
+    .pitch-line.top    { top: 18%; }
+    .pitch-line.mid    { top: 50%; }
+    .pitch-line.bottom { bottom: 18%; }
+
+    .pitch-goal {
+      position: absolute;
+      left: 35%; right: 35%;
+      height: 3%;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .pitch-goal.top    { top: 0; border-top: none; }
+    .pitch-goal.bottom { bottom: 0; border-bottom: none; }
+
+    /* ── Player Rows ────────────────────────────── */
+    .player-row {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      flex: 1;
+      align-items: center;
+    }
+
+    .player-card {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 0.3rem; width: 80px; cursor: pointer;
+      position: relative; z-index: 2;
+    }
+    .player-avatar {
+      width: 54px; height: 54px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.75rem; font-family: var(--font-mono);
+      border: 2px solid rgba(255,255,255,0.15);
+      position: relative; transition: all 0.2s;
+      background: var(--pos-bg, #1a2235);
+      color: var(--pos-color, var(--text));
+    }
+    .player-card:hover .player-avatar {
+      transform: scale(1.1);
+      border-color: var(--pos-color, var(--accent));
+      box-shadow: 0 0 16px rgba(0,212,170,0.3);
+    }
+
+    /* position colors */
+    .pos-GKP { --pos-bg: #1a1f35; --pos-color: #facc15; }
+    .pos-DEF { --pos-bg: #0f2d1a; --pos-color: #00d4aa; }
+    .pos-MID { --pos-bg: #1a1a35; --pos-color: #3b82f6; }
+    .pos-FWD { --pos-bg: #2d0f0f; --pos-color: #ef4444; }
+
+    /* captain / vc badges */
+    .badge-c, .badge-vc {
+      position: absolute; top: -4px; right: -4px;
+      width: 18px; height: 18px; border-radius: 50%;
+      font-size: 0.55rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      border: 1.5px solid var(--bg);
+    }
+    .badge-c  { background: var(--accent3); color: #0a0e1a; }
+    .badge-vc { background: var(--muted);   color: #0a0e1a; }
+
+    .player-pts-bubble {
+      position: absolute; bottom: -6px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent); color: #0a0e1a;
+      font-family: var(--font-mono); font-size: 0.55rem; font-weight: 700;
+      padding: 1px 5px; border-radius: 10px;
+      white-space: nowrap;
+    }
+
+    .player-name {
+      font-size: 0.68rem; font-weight: 600; text-align: center;
+      color: white; text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+      line-height: 1.2; max-width: 75px;
+      background: rgba(0,0,0,0.55);
+      padding: 1px 4px; border-radius: 4px;
+    }
+    .player-price {
+      font-family: var(--font-mono); font-size: 0.6rem;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* ── Bench Panel ────────────────────────────── */
+    .bench-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .bench-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-head); font-size: 1.4rem; letter-spacing: 1px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .bench-list { padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .bench-item {
+      display: flex; align-items: center; gap: 0.75rem;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 0.75rem 1rem;
+      transition: border-color 0.2s; cursor: pointer;
+    }
+    .bench-item:hover { border-color: var(--accent); }
+    .bench-num {
+      font-family: var(--font-mono); font-size: 0.7rem;
+      color: var(--muted); width: 20px; text-align: center;
+    }
+    .bench-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; font-weight: 700;
+      border: 1.5px solid rgba(255,255,255,0.1);
+      background: var(--pos-bg, var(--card));
+      color: var(--pos-color, var(--text));
+      flex-shrink: 0;
+    }
+    .bench-info { flex: 1; }
+    .bench-name { font-size: 0.85rem; font-weight: 600; }
+    .bench-meta { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); }
+    .bench-pts {
+      font-family: var(--font-head); font-size: 1.3rem;
+      color: var(--accent); letter-spacing: 1px;
+    }
+
+    /* ── Hot Players ─────────────────────────────── */
+    .hot-section { margin-bottom: 2rem; }
+    .hot-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem; }
+    .hot-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .hot-tab {
+      font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 1px;
+      padding: 0.3rem 0.8rem; border-radius: 20px; cursor: pointer;
+      border: 1px solid var(--border); color: var(--muted);
+      background: transparent; transition: all 0.2s;
+    }
+    .hot-tab.active { border-color: var(--accent3); color: var(--accent3); background: rgba(245,158,11,0.1); }
+
+    .hot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    .hot-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem;
+      position: relative; overflow: hidden; transition: all 0.25s;
+    }
+    .hot-card:hover {
+      border-color: var(--accent3);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .hot-rank {
+      position: absolute; top: 1rem; right: 1rem;
+      font-family: var(--font-head); font-size: 2.5rem;
+      color: rgba(255,255,255,0.04); line-height: 1;
+    }
+    .hot-pos-tag {
+      font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 1.5px;
+      padding: 0.15rem 0.5rem; border-radius: 4px; margin-bottom: 0.5rem;
+      display: inline-block;
+    }
+    .hot-pos-tag.GKP { background: rgba(250,204,21,0.15); color: #facc15; }
+    .hot-pos-tag.DEF { background: rgba(0,212,170,0.15); color: var(--accent); }
+    .hot-pos-tag.MID { background: rgba(59,130,246,0.15); color: var(--accent2); }
+    .hot-pos-tag.FWD { background: rgba(239,68,68,0.15); color: var(--danger); }
+
+    .hot-name { font-size: 1rem; font-weight: 700; margin-bottom: 0.2rem; }
+    .hot-club { font-size: 0.72rem; color: var(--muted); margin-bottom: 1rem; }
+
+    .hot-stats { display: flex; flex-direction: column; gap: 0.5rem; }
+    .hot-stat-row {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.75rem;
+    }
+    .hot-stat-key { color: var(--muted); }
+    .hot-stat-val { font-family: var(--font-mono); font-weight: 700; }
+    .hot-stat-val.form  { color: var(--accent3); }
+    .hot-stat-val.price { color: var(--accent); }
+    .hot-stat-val.own   { color: var(--accent2); }
+
+    .fdr-pip {
+      display: inline-block;
+      width: 10px; height: 10px; border-radius: 2px;
+      margin-right: 3px; vertical-align: middle;
+    }
+    .fdr-1 { background: var(--fdr1); }
+    .fdr-2 { background: var(--fdr2); }
+    .fdr-3 { background: var(--fdr3); }
+    .fdr-4 { background: var(--fdr4); }
+    .fdr-5 { background: var(--fdr5); }
+
+    .price-change {
+      font-family: var(--font-mono); font-size: 0.65rem;
+      padding: 0.1rem 0.4rem; border-radius: 4px;
+    }
+    .price-change.up   { background: rgba(0,212,170,0.15); color: var(--accent); }
+    .price-change.down { background: rgba(239,68,68,0.15); color: var(--danger); }
+    .price-change.flat { background: rgba(100,116,139,0.15); color: var(--muted); }
+
+    /* ── Placeholder / Empty state ───────────────── */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 4rem 2rem; text-align: center;
+      color: var(--muted);
+    }
+    .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+    .empty-title { font-family: var(--font-head); font-size: 1.5rem; letter-spacing: 1px; margin-bottom: 0.5rem; }
+    .empty-sub { font-size: 0.85rem; line-height: 1.6; }
+
+    /* ── Tooltip ─────────────────────────────────── */
+    .tooltip-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+    }
+    .tooltip-overlay.show { display: flex; }
+    .tooltip-box {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 2rem; width: 340px; max-width: 90vw;
+      position: relative;
+    }
+    .tooltip-close {
+      position: absolute; top: 1rem; right: 1rem;
+      background: none; border: none; color: var(--muted);
+      font-size: 1.2rem; cursor: pointer;
+    }
+    .tbox-pos { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); margin-bottom: 0.4rem; }
+    .tbox-name { font-family: var(--font-head); font-size: 1.8rem; letter-spacing: 1px; margin-bottom: 0.2rem; }
+    .tbox-club { font-size: 0.8rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .tbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .tbox-stat { background: var(--surface); border-radius: 8px; padding: 0.75rem; text-align: center; }
+    .tbox-val { font-family: var(--font-head); font-size: 1.5rem; letter-spacing: 1px; }
+    .tbox-key { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.2rem; }
+
+    /* ── Animations ──────────────────────────────── */
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    .fade-in { animation: fadeIn 0.4s ease forwards; }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- ── Navbar ──────────────────────────────────────── -->
+<nav>
+  <a href="../index.html" class="nav-logo">FPL<span>HUB</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">🏠 Home</a></li>
+    <li><a href="fantasy.html" class="active">⚡ Fantasy</a></li>
+    <li><a href="predictions.html">🎯 Predict</a></li>
+    <li><a href="watchalong.html">📺 Watch Along</a></li>
+    <li><a href="../overlay.html" target="_blank">🎮 OBS</a></li>
+  </ul>
+</nav>
+
+<!-- ── Player Detail Tooltip ───────────────────────── -->
+<div class="tooltip-overlay" id="playerTooltip" onclick="closeTooltip(event)">
+  <div class="tooltip-box">
+    <button class="tooltip-close" onclick="document.getElementById('playerTooltip').classList.remove('show')">✕</button>
+    <div class="tbox-pos" id="tt-pos">MID</div>
+    <div class="tbox-name" id="tt-name">Player Name</div>
+    <div class="tbox-club" id="tt-club">Club · £8.5m</div>
+    <div class="tbox-grid">
+      <div class="tbox-stat">
+        <div class="tbox-val" id="tt-pts" style="color:var(--accent)">0</div>
+        <div class="tbox-key">GW Points</div>
+      </div>
+      <div class="tbox-stat">
+        <div class="tbox-val" id="tt-total" style="color:var(--accent2)">0</div>
+        <div class="tbox-key">Total Pts</div>
+      </div>
+      <div class="tbox-stat">
+        <div class="tbox-val" id="tt-form" style="color:var(--accent3)">0.0</div>
+        <div class="tbox-key">Form</div>
+      </div>
+      <div class="tbox-stat">
+        <div class="tbox-val" id="tt-own" style="color:var(--purple)">0%</div>
+        <div class="tbox-key">Ownership</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Page ────────────────────────────────────────── -->
+<div class="page">
+
+  <!-- ID Input -->
+  <div class="id-section">
+    <div class="id-info">
+      <div class="label">// fpl team id</div>
+      <h2 style="font-family:var(--font-head);font-size:1.6rem;letter-spacing:1px;">LOAD YOUR <span style="color:var(--accent)">SQUAD</span></h2>
+      <p>Enter your FPL Team ID to load squad. Find it at:<br>
+         <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--accent)">
+           fantasy.premierleague.com → Pick Team → URL → /entry/<strong>ID</strong>/
+         </span>
+      </p>
+    </div>
+    <div class="id-form">
+      <input type="number" class="id-input" id="teamIdInput" placeholder="e.g. 1234567" min="1" />
+      <button class="btn-load" id="loadBtn" onclick="loadTeam()">LOAD TEAM</button>
+      <button class="btn-demo" onclick="loadDemo()">Demo Mode</button>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar" id="statusBar">
+    <div class="status-dot idle" id="statusDot"></div>
+    <span id="statusText">Enter your Team ID above to get started</span>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-grid" id="summaryGrid" style="display:none">
+    <div class="sum-card green">
+      <div class="sum-val" id="s-gwpts">—</div>
+      <div class="sum-label">GW Points</div>
+    </div>
+    <div class="sum-card blue">
+      <div class="sum-val" id="s-total">—</div>
+      <div class="sum-label">Total Points</div>
+    </div>
+    <div class="sum-card amber">
+      <div class="sum-val" id="s-rank">—</div>
+      <div class="sum-label">Overall Rank</div>
+    </div>
+    <div class="sum-card purple">
+      <div class="sum-val" id="s-gw">—</div>
+      <div class="sum-label">Gameweek</div>
+    </div>
+    <div class="sum-card red">
+      <div class="sum-val" id="s-tv">—</div>
+      <div class="sum-label">Team Value</div>
+    </div>
+    <div class="sum-card green" style="--card:var(--surface)">
+      <div class="sum-val" id="s-bank">—</div>
+      <div class="sum-label">In Bank</div>
+    </div>
+  </div>
+
+  <!-- Main Grid: Pitch + Bench -->
+  <div class="main-grid" id="mainGrid" style="display:none">
+
+    <!-- Pitch -->
+    <div class="pitch-wrap">
+      <div class="pitch-header">
+        <div>
+          <div class="label">// starting xi</div>
+          <div class="pitch-title" id="teamName">YOUR TEAM</div>
+        </div>
+        <div class="formation-badge" id="formationBadge">—</div>
+      </div>
+      <div class="pitch" id="pitchArea">
+        <div class="pitch-line top"></div>
+        <div class="pitch-line bottom"></div>
+        <div class="pitch-goal top"></div>
+        <div class="pitch-goal bottom"></div>
+        <!-- rows rendered by JS -->
+        <div class="empty-state" id="pitchEmpty">
+          <div class="empty-icon">⚽</div>
+          <div class="empty-title">NO SQUAD LOADED</div>
+          <div class="empty-sub">Enter your Team ID and click Load Team</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bench -->
+    <div class="bench-panel">
+      <div class="bench-header">
+        <span>BENCH</span>
+        <span class="formation-badge" style="background:rgba(100,116,139,0.1);border-color:rgba(100,116,139,0.3);color:var(--muted);">4 SUB</span>
+      </div>
+      <div class="bench-list" id="benchList">
+        <div class="empty-state" style="padding:2rem;">
+          <div class="empty-icon" style="font-size:2rem;">🪑</div>
+          <div class="empty-sub">Bench will appear here</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Hot Players Section -->
+  <div class="hot-section" id="hotSection" style="display:none">
+    <div class="hot-header">
+      <div>
+        <div class="label">// this gameweek</div>
+        <h2 class="section-title">🔥 HOT <span>PLAYERS</span></h2>
+      </div>
+      <div class="hot-tabs">
+        <button class="hot-tab active" data-sort="form" onclick="sortHot('form',this)">FORM</button>
+        <button class="hot-tab" data-sort="price" onclick="sortHot('price',this)">PRICE</button>
+        <button class="hot-tab" data-sort="own" onclick="sortHot('own',this)">OWNERSHIP</button>
+        <button class="hot-tab" data-sort="fdr" onclick="sortHot('fdr',this)">EASY FDR</button>
+      </div>
+    </div>
+    <div class="hot-grid" id="hotGrid"></div>
+  </div>
+
+</div><!-- /page -->
+
+<footer style="border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:0.72rem;color:var(--muted);">
+  FPL Hub · Data via FPL API (fpl-proxy) + Static fallback · <a href="../index.html" style="color:var(--accent);text-decoration:none;">← Home</a>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════════
+// CORS proxy options (try in order):
+const PROXIES = [
+  'https://corsproxy.io/?',
+  'https://api.allorigins.win/raw?url=',
+];
+const FPL_BASE = 'https://fantasy.premierleague.com/api';
+
+// Positions
+const POS = { 1:'GKP', 2:'DEF', 3:'MID', 4:'FWD' };
+
+// Club short names (id → short)
+const CLUBS = {
+  1:'ARS',2:'AVL',3:'BOU',4:'BRE',5:'BHA',6:'CHE',7:'CRY',8:'EVE',
+  9:'FUL',10:'IPS',11:'LEI',12:'LIV',13:'LUT',14:'MCI',15:'MUN',
+  16:'NEW',17:'NFO',18:'SHU',19:'SOU',20:'TOT',21:'WHU',22:'WOL'
+};
+
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+let allPlayers   = {};   // id → player data from bootstrap
+let allTeams     = {};   // id → team data
+let hotPlayers   = [];   // array for hot section
+let currentSort  = 'form';
+let loadedTeam   = null; // loaded picks data
+
+// ═══════════════════════════════════════════════════════
+//  STATUS HELPERS
+// ═══════════════════════════════════════════════════════
+function setStatus(state, msg) {
+  const dot  = document.getElementById('statusDot');
+  const text = document.getElementById('statusText');
+  dot.className  = `status-dot ${state}`;
+  text.textContent = msg;
+}
+
+// ═══════════════════════════════════════════════════════
+//  FETCH WITH PROXY FALLBACK
+// ═══════════════════════════════════════════════════════
+async function fetchFPL(path) {
+  const url = `${FPL_BASE}${path}`;
+  for (const proxy of PROXIES) {
+    try {
+      const res = await fetch(proxy + encodeURIComponent(url));
+      if (res.ok) return await res.json();
+    } catch(e) {}
+  }
+  throw new Error('All proxies failed');
+}
+
+// ═══════════════════════════════════════════════════════
+//  LOAD BOOTSTRAP (player + team data)
+// ═══════════════════════════════════════════════════════
+async function loadBootstrap() {
+  const data = await fetchFPL('/bootstrap-static/');
+  data.elements.forEach(p => { allPlayers[p.id] = p; });
+  data.teams.forEach(t    => { allTeams[t.id]   = t; });
+
+  // Build hot players list (top 12 by form)
+  hotPlayers = data.elements
+    .filter(p => p.minutes > 90)
+    .map(p => ({
+      id: p.id,
+      name: p.web_name,
+      fullName: `${p.first_name} ${p.second_name}`,
+      club: CLUBS[p.team] || '?',
+      clubFull: allTeams[p.team]?.name || '',
+      pos: POS[p.element_type],
+      form: parseFloat(p.form) || 0,
+      price: p.now_cost / 10,
+      priceChange: (p.cost_change_event / 10),
+      own: parseFloat(p.selected_by_percent) || 0,
+      totalPts: p.total_points,
+      gwPts: p.event_points,
+      fdr: 3, // default; ideally fetch fixtures
+    }));
+
+  return data;
+}
+
+// ═══════════════════════════════════════════════════════
+//  LOAD TEAM
+// ═══════════════════════════════════════════════════════
+async function loadTeam() {
+  const id = document.getElementById('teamIdInput').value.trim();
+  if (!id) { setStatus('error','Please enter a Team ID'); return; }
+
+  const btn = document.getElementById('loadBtn');
+  btn.disabled = true;
+  btn.textContent = 'Loading...';
+  setStatus('loading', `Fetching team #${id}…`);
+
+  try {
+    // 1. Bootstrap data
+    setStatus('loading','Loading player database…');
+    await loadBootstrap();
+
+    // 2. Team entry info
+    setStatus('loading','Loading team info…');
+    const entry = await fetchFPL(`/entry/${id}/`);
+
+    // 3. Current GW picks
+    const gw = entry.current_event;
+    setStatus('loading', `Loading GW${gw} picks…`);
+    const picks = await fetchFPL(`/entry/${id}/event/${gw}/picks/`);
+
+    // Save
+    loadedTeam = { entry, picks, gw };
+
+    // Render
+    renderSummary(entry, picks, gw);
+    renderPitch(picks.picks, entry.name);
+    renderHot('form');
+
+    // Show sections
+    document.getElementById('summaryGrid').style.display = 'grid';
+    document.getElementById('mainGrid').style.display = 'grid';
+    document.getElementById('hotSection').style.display = 'block';
+
+    setStatus('ok', `✓ Loaded: ${entry.name} · GW${gw} · Rank #${entry.summary_overall_rank?.toLocaleString() || '?'}`);
+
+    // Save to localStorage
+    localStorage.setItem('fplTeamId', id);
+
+  } catch(e) {
+    setStatus('error', `Failed to load: ${e.message}. Try Demo Mode.`);
+    console.error(e);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'LOAD TEAM';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER SUMMARY
+// ═══════════════════════════════════════════════════════
+function renderSummary(entry, picks, gw) {
+  document.getElementById('s-gwpts').textContent = picks.entry_history?.points ?? '—';
+  document.getElementById('s-total').textContent = entry.summary_overall_points?.toLocaleString() ?? '—';
+  const rank = entry.summary_overall_rank;
+  document.getElementById('s-rank').textContent = rank ? (rank > 999 ? (rank/1000).toFixed(0)+'K' : rank) : '—';
+  document.getElementById('s-gw').textContent   = `GW${gw}`;
+  const tv   = picks.entry_history?.value ?? 0;
+  const bank = picks.entry_history?.bank  ?? 0;
+  document.getElementById('s-tv').textContent   = tv   ? `£${(tv/10).toFixed(1)}m`   : '—';
+  document.getElementById('s-bank').textContent = bank ? `£${(bank/10).toFixed(1)}m` : '—';
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER PITCH
+// ═══════════════════════════════════════════════════════
+function renderPitch(picks, teamName) {
+  const starters = picks.filter(p => p.position <= 11);
+  const bench    = picks.filter(p => p.position > 11).sort((a,b) => a.position - b.position);
+
+  // Detect formation
+  const defs = starters.filter(p => POS[allPlayers[p.element]?.element_type] === 'DEF').length;
+  const mids = starters.filter(p => POS[allPlayers[p.element]?.element_type] === 'MID').length;
+  const fwds = starters.filter(p => POS[allPlayers[p.element]?.element_type] === 'FWD').length;
+  const formation = `${defs}-${mids}-${fwds}`;
+  document.getElementById('formationBadge').textContent = formation;
+  document.getElementById('teamName').textContent = teamName.toUpperCase();
+
+  // Group by position
+  const rows = {
+    GKP: starters.filter(p => POS[allPlayers[p.element]?.element_type] === 'GKP'),
+    DEF: starters.filter(p => POS[allPlayers[p.element]?.element_type] === 'DEF'),
+    MID: starters.filter(p => POS[allPlayers[p.element]?.element_type] === 'MID'),
+    FWD: starters.filter(p => POS[allPlayers[p.element]?.element_type] === 'FWD'),
+  };
+
+  const pitch = document.getElementById('pitchArea');
+  document.getElementById('pitchEmpty').style.display = 'none';
+
+  // Clear old rows
+  pitch.querySelectorAll('.player-row').forEach(r => r.remove());
+
+  // Render rows: FWD top → DEF bottom (attack at top of pitch)
+  ['FWD','MID','DEF','GKP'].forEach(pos => {
+    if (!rows[pos].length) return;
+    const row = document.createElement('div');
+    row.className = 'player-row';
+    rows[pos].forEach(pick => {
+      const pl = allPlayers[pick.element];
+      if (!pl) return;
+      row.appendChild(makePlayerCard(pl, pick, pos));
+    });
+    pitch.appendChild(row);
+  });
+
+  // Bench
+  const benchList = document.getElementById('benchList');
+  benchList.innerHTML = '';
+  bench.forEach((pick, i) => {
+    const pl = allPlayers[pick.element];
+    if (!pl) return;
+    const pos = POS[pl.element_type];
+    const item = document.createElement('div');
+    item.className = 'bench-item';
+    item.onclick = () => showPlayerDetail(pl, pick);
+    item.innerHTML = `
+      <div class="bench-num">${i+1}</div>
+      <div class="bench-avatar pos-${pos}">${pl.web_name.slice(0,3).toUpperCase()}</div>
+      <div class="bench-info">
+        <div class="bench-name">${pl.web_name}</div>
+        <div class="bench-meta">${pos} · ${CLUBS[pl.team]||'?'} · £${(pl.now_cost/10).toFixed(1)}m</div>
+      </div>
+      <div class="bench-pts">${pl.event_points ?? 0}</div>
+    `;
+    benchList.appendChild(item);
+  });
+}
+
+function makePlayerCard(pl, pick, pos) {
+  const card = document.createElement('div');
+  card.className = `player-card pos-${pos}`;
+  card.onclick = () => showPlayerDetail(pl, pick);
+
+  const isCap  = pick.is_captain;
+  const isVC   = pick.is_vice_captain;
+  const pts    = pl.event_points ?? 0;
+  const dispPts = isCap ? pts * 2 : pts;
+
+  card.innerHTML = `
+    <div class="player-avatar pos-${pos}">
+      ${pl.web_name.slice(0,3).toUpperCase()}
+      ${isCap  ? '<span class="badge-c">C</span>'  : ''}
+      ${isVC   ? '<span class="badge-vc">V</span>' : ''}
+      <span class="player-pts-bubble">${dispPts}pts</span>
+    </div>
+    <div class="player-name">${pl.web_name}</div>
+    <div class="player-price">£${(pl.now_cost/10).toFixed(1)}m</div>
+  `;
+  return card;
+}
+
+// ═══════════════════════════════════════════════════════
+//  PLAYER DETAIL TOOLTIP
+// ═══════════════════════════════════════════════════════
+function showPlayerDetail(pl, pick) {
+  const pos = POS[pl.element_type];
+  const isCap = pick?.is_captain;
+  document.getElementById('tt-pos').textContent  = `${pos} · ${CLUBS[pl.team]||'?'} ${isCap ? '· ©CAPTAIN':''}`;
+  document.getElementById('tt-name').textContent = pl.web_name;
+  document.getElementById('tt-club').textContent = `${allTeams[pl.team]?.name||''} · £${(pl.now_cost/10).toFixed(1)}m`;
+  document.getElementById('tt-pts').textContent  = pl.event_points ?? 0;
+  document.getElementById('tt-total').textContent= pl.total_points ?? 0;
+  document.getElementById('tt-form').textContent = pl.form ?? '—';
+  document.getElementById('tt-own').textContent  = (pl.selected_by_percent ?? '—') + '%';
+  document.getElementById('playerTooltip').classList.add('show');
+}
+
+function closeTooltip(e) {
+  if (e.target.id === 'playerTooltip')
+    document.getElementById('playerTooltip').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════════
+//  HOT PLAYERS
+// ═══════════════════════════════════════════════════════
+function sortHot(key, btn) {
+  currentSort = key;
+  document.querySelectorAll('.hot-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderHot(key);
+}
+
+function renderHot(key) {
+  let sorted = [...hotPlayers];
+  if (key === 'form')  sorted.sort((a,b) => b.form - a.form);
+  if (key === 'price') sorted.sort((a,b) => b.priceChange - a.priceChange);
+  if (key === 'own')   sorted.sort((a,b) => b.own - a.own);
+  if (key === 'fdr')   sorted.sort((a,b) => a.fdr - b.fdr);
+
+  const top = sorted.slice(0, 8);
+  const grid = document.getElementById('hotGrid');
+  grid.innerHTML = '';
+  top.forEach((p, i) => {
+    const pcClass = p.priceChange > 0 ? 'up' : p.priceChange < 0 ? 'down' : 'flat';
+    const pcText  = p.priceChange > 0 ? `▲ +£${p.priceChange.toFixed(1)}m` :
+                    p.priceChange < 0 ? `▼ £${p.priceChange.toFixed(1)}m` : '= No change';
+    const fdrClass = `fdr-${Math.min(5,Math.max(1,Math.round(p.fdr)))}`;
+
+    const card = document.createElement('div');
+    card.className = 'hot-card fade-in';
+    card.style.animationDelay = `${i*0.05}s`;
+    card.innerHTML = `
+      <div class="hot-rank">${i+1}</div>
+      <span class="hot-pos-tag ${p.pos}">${p.pos}</span>
+      <div class="hot-name">${p.name}</div>
+      <div class="hot-club">${p.clubFull || p.club}</div>
+      <div class="hot-stats">
+        <div class="hot-stat-row">
+          <span class="hot-stat-key">Form (5GW)</span>
+          <span class="hot-stat-val form">${p.form.toFixed(1)}</span>
+        </div>
+        <div class="hot-stat-row">
+          <span class="hot-stat-key">Price</span>
+          <span class="hot-stat-val price">
+            £${p.price.toFixed(1)}m
+            <span class="price-change ${pcClass}">${pcText}</span>
+          </span>
+        </div>
+        <div class="hot-stat-row">
+          <span class="hot-stat-key">Ownership</span>
+          <span class="hot-stat-val own">${p.own.toFixed(1)}%</span>
+        </div>
+        <div class="hot-stat-row">
+          <span class="hot-stat-key">Next FDR</span>
+          <span class="hot-stat-val">
+            <span class="fdr-pip ${fdrClass}"></span>
+            ${p.fdr === 1 ? 'Very Easy' : p.fdr === 2 ? 'Easy' : p.fdr === 3 ? 'Medium' : p.fdr === 4 ? 'Hard' : 'Very Hard'}
+          </span>
+        </div>
+        <div class="hot-stat-row">
+          <span class="hot-stat-key">GW Points</span>
+          <span class="hot-stat-val" style="color:var(--accent)">${p.gwPts ?? '—'}</span>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  DEMO MODE (hardcoded for testing without API)
+// ═══════════════════════════════════════════════════════
+function loadDemo() {
+  setStatus('ok', '✓ Demo Mode — showing sample data');
+
+  // Fake summary
+  document.getElementById('s-gwpts').textContent = '72';
+  document.getElementById('s-total').textContent = '1,842';
+  document.getElementById('s-rank').textContent  = '87K';
+  document.getElementById('s-gw').textContent    = 'GW28';
+  document.getElementById('s-tv').textContent    = '£103.2m';
+  document.getElementById('s-bank').textContent  = '£1.5m';
+
+  document.getElementById('summaryGrid').style.display = 'grid';
+  document.getElementById('mainGrid').style.display = 'grid';
+  document.getElementById('hotSection').style.display = 'block';
+
+  // Fake pitch
+  document.getElementById('teamName').textContent    = 'DEMO SQUAD';
+  document.getElementById('formationBadge').textContent = '4-3-3';
+  document.getElementById('pitchEmpty').style.display = 'none';
+
+  const demoSquad = {
+    GKP: [{ name:'Flekken',    pts:6,  price:'£4.5m', cap:false, vc:false }],
+    DEF: [
+      { name:'Alexander-Arnold', pts:14, price:'£7.8m', cap:false, vc:true },
+      { name:'Pedro Porro',      pts:8,  price:'£5.9m', cap:false, vc:false },
+      { name:'Mykolenko',        pts:6,  price:'£4.6m', cap:false, vc:false },
+      { name:'Faes',             pts:4,  price:'£4.4m', cap:false, vc:false },
+    ],
+    MID: [
+      { name:'Salah',    pts:22, price:'£13.2m', cap:true,  vc:false },
+      { name:'Palmer',   pts:10, price:'£11.5m', cap:false, vc:false },
+      { name:'Mbeumo',   pts:9,  price:'£7.2m',  cap:false, vc:false },
+    ],
+    FWD: [
+      { name:'Isak',    pts:12, price:'£8.8m', cap:false, vc:false },
+      { name:'Watkins', pts:8,  price:'£8.4m', cap:false, vc:false },
+      { name:'Jimenez', pts:5,  price:'£5.9m', cap:false, vc:false },
+    ],
+  };
+
+  const pitch = document.getElementById('pitchArea');
+  pitch.querySelectorAll('.player-row').forEach(r => r.remove());
+
+  ['FWD','MID','DEF','GKP'].forEach(pos => {
+    const row = document.createElement('div');
+    row.className = 'player-row';
+    demoSquad[pos].forEach(p => {
+      const card = document.createElement('div');
+      card.className = `player-card pos-${pos}`;
+      card.innerHTML = `
+        <div class="player-avatar pos-${pos}">
+          ${p.name.split(' ').pop().slice(0,3).toUpperCase()}
+          ${p.cap ? '<span class="badge-c">C</span>'  : ''}
+          ${p.vc  ? '<span class="badge-vc">V</span>' : ''}
+          <span class="player-pts-bubble">${p.cap ? p.pts*2 : p.pts}pts</span>
+        </div>
+        <div class="player-name">${p.name}</div>
+        <div class="player-price">${p.price}</div>
+      `;
+      row.appendChild(card);
+    });
+    pitch.appendChild(row);
+  });
+
+  // Bench
+  const benchData = [
+    { name:'Henderson', pos:'GKP', pts:2, price:'£4.0m' },
+    { name:'Dunk',      pos:'DEF', pts:3, price:'£4.3m' },
+    { name:'Andreas',   pos:'MID', pts:1, price:'£5.2m' },
+    { name:'Wood',      pos:'FWD', pts:6, price:'£5.5m' },
+  ];
+  const benchList = document.getElementById('benchList');
+  benchList.innerHTML = '';
+  benchData.forEach((p, i) => {
+    const item = document.createElement('div');
+    item.className = 'bench-item';
+    item.innerHTML = `
+      <div class="bench-num">${i+1}</div>
+      <div class="bench-avatar pos-${p.pos}">${p.name.slice(0,3).toUpperCase()}</div>
+      <div class="bench-info">
+        <div class="bench-name">${p.name}</div>
+        <div class="bench-meta">${p.pos} · ${p.price}</div>
+      </div>
+      <div class="bench-pts">${p.pts}</div>
+    `;
+    benchList.appendChild(item);
+  });
+
+  // Hot players demo
+  hotPlayers = [
+    { name:'Salah',    fullName:'Mohamed Salah',    club:'LIV', clubFull:'Liverpool',      pos:'MID', form:9.8, price:13.2, priceChange:0.1,  own:72.4, gwPts:22, fdr:2 },
+    { name:'Isak',     fullName:'Alexander Isak',   club:'NEW', clubFull:'Newcastle',      pos:'FWD', form:8.2, price:8.8,  priceChange:0.2,  own:28.1, gwPts:12, fdr:1 },
+    { name:'Palmer',   fullName:'Cole Palmer',      club:'CHE', clubFull:'Chelsea',        pos:'MID', form:7.6, price:11.5, priceChange:0.0,  own:51.3, gwPts:10, fdr:3 },
+    { name:'T-Arnold', fullName:'Trent Alexander-Arnold', club:'LIV', clubFull:'Liverpool',pos:'DEF', form:7.4, price:7.8,  priceChange:-0.1, own:43.2, gwPts:14, fdr:2 },
+    { name:'Mbeumo',   fullName:'Bryan Mbeumo',     club:'BRE', clubFull:'Brentford',     pos:'MID', form:7.0, price:7.2,  priceChange:0.2,  own:22.5, gwPts:9,  fdr:1 },
+    { name:'Watkins',  fullName:'Ollie Watkins',    club:'AVL', clubFull:'Aston Villa',   pos:'FWD', form:6.8, price:8.4,  priceChange:0.0,  own:35.7, gwPts:8,  fdr:2 },
+    { name:'Porro',    fullName:'Pedro Porro',      club:'TOT', clubFull:'Tottenham',     pos:'DEF', form:6.4, price:5.9,  priceChange:0.1,  own:18.9, gwPts:8,  fdr:3 },
+    { name:'Flekken',  fullName:'Mark Flekken',     club:'BRE', clubFull:'Brentford',     pos:'GKP', form:5.8, price:4.5,  priceChange:0.0,  own:12.3, gwPts:6,  fdr:1 },
+  ];
+  renderHot('form');
+}
+
+// ═══════════════════════════════════════════════════════
+//  AUTO-LOAD SAVED ID
+// ═══════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('fplTeamId');
+  if (saved) {
+    document.getElementById('teamIdInput').value = saved;
+    setStatus('idle', `Last loaded Team ID: ${saved} — Click Load Team`);
+  }
+  // Enter key trigger
+  document.getElementById('teamIdInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') loadTeam();
+  });
+});
+</script>
+</body>
+</html>
