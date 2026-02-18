@@ -1,472 +1,316 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Fantasy Team — FPL Hub</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
   <style>
-    :root {
-      --bg:       #0a0e1a;
-      --surface:  #111827;
-      --card:     #1a2235;
-      --border:   #1f2d45;
-      --accent:   #00d4aa;
-      --accent2:  #3b82f6;
-      --accent3:  #f59e0b;
-      --danger:   #ef4444;
-      --purple:   #a855f7;
-      --text:     #e2e8f0;
-      --muted:    #64748b;
-      --font-head:'Bebas Neue', sans-serif;
-      --font-body:'DM Sans', sans-serif;
-      --font-mono:'JetBrains Mono', monospace;
+    :root{
+      --bg:#080c14;--surface:#0e1420;--card:#121a2b;--card2:#172035;
+      --border:#1c2d44;--accent:#00d4aa;--blue:#3b82f6;--amber:#f59e0b;
+      --danger:#ef4444;--purple:#a855f7;--green:#22c55e;
+      --text:#e2e8f0;--muted:#4a5f7a;
+      --font-h:'Bebas Neue',sans-serif;
+      --font-b:'DM Sans',sans-serif;
+      --font-m:'JetBrains Mono',monospace;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:var(--font-b);min-height:100vh}
 
-      /* FDR Colors */
-      --fdr1: #00d4aa;
-      --fdr2: #86efac;
-      --fdr3: #f59e0b;
-      --fdr4: #f97316;
-      --fdr5: #ef4444;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-body);
-      min-height: 100vh;
-    }
-
-    /* ── Navbar ─────────────────────────────────── */
-    nav {
-      position: sticky; top: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 2rem; height: 60px;
-      background: rgba(10,14,26,0.9);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-logo { font-family: var(--font-head); font-size: 1.6rem; color: var(--accent); text-decoration: none; }
-    .nav-logo span { color: var(--text); }
-    .nav-links { display: flex; gap: 0.25rem; list-style: none; }
-    .nav-links a {
-      padding: 0.4rem 0.9rem; border-radius: 6px; text-decoration: none;
-      font-size: 0.82rem; font-weight: 500; color: var(--muted); transition: all 0.2s;
-    }
-    .nav-links a:hover, .nav-links a.active { color: var(--accent); background: var(--card); }
-
-    /* ── Page Layout ────────────────────────────── */
-    .page { max-width: 1400px; margin: 0 auto; padding: 2rem; }
-
-    /* ── Section Label ──────────────────────────── */
-    .label {
-      font-family: var(--font-mono); font-size: 0.65rem;
-      letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
-      margin-bottom: 0.4rem;
-    }
-    .section-title {
-      font-family: var(--font-head); font-size: 2rem;
-      letter-spacing: 2px; line-height: 1;
-    }
-    .section-title span { color: var(--accent); }
-
-    /* ── ID Input Section ───────────────────────── */
-    .id-section {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 2rem;
-      margin-bottom: 2rem;
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-    }
-    .id-info { flex: 1; min-width: 200px; }
-    .id-info p { font-size: 0.85rem; color: var(--muted); margin-top: 0.3rem; line-height: 1.5; }
-    .id-form { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
-    .id-input {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 8px; padding: 0.6rem 1rem;
-      color: var(--text); font-family: var(--font-mono); font-size: 1rem;
-      width: 160px; transition: border-color 0.2s; outline: none;
-    }
-    .id-input:focus { border-color: var(--accent); }
-    .id-input::placeholder { color: var(--muted); }
-    .btn-load {
-      background: var(--accent); color: #0a0e1a;
-      border: none; border-radius: 8px; padding: 0.6rem 1.5rem;
-      font-weight: 700; font-size: 0.9rem; cursor: pointer;
-      transition: all 0.2s; white-space: nowrap;
-    }
-    .btn-load:hover { background: #00f0c0; transform: translateY(-1px); }
-    .btn-load:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .btn-demo {
-      background: transparent; color: var(--muted);
-      border: 1px solid var(--border); border-radius: 8px;
-      padding: 0.6rem 1rem; font-size: 0.8rem; cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn-demo:hover { border-color: var(--accent3); color: var(--accent3); }
-
-    /* ── Status ─────────────────────────────────── */
-    .status-bar {
-      display: flex; align-items: center; gap: 0.6rem;
-      font-family: var(--font-mono); font-size: 0.72rem;
-      padding: 0.4rem 1rem; border-radius: 20px;
-      background: var(--card); border: 1px solid var(--border);
-      width: fit-content; margin-bottom: 2rem;
-    }
-    .status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-    .status-dot.idle    { background: var(--muted); }
-    .status-dot.loading { background: var(--accent3); animation: pulse 1s infinite; }
-    .status-dot.ok      { background: var(--accent); }
-    .status-dot.error   { background: var(--danger); }
-
-    /* ── Summary Cards ──────────────────────────── */
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-    .sum-card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 12px; padding: 1.25rem;
-      text-align: center;
-    }
-    .sum-val {
-      font-family: var(--font-head); font-size: 2.2rem;
-      letter-spacing: 1px; line-height: 1;
-    }
-    .sum-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 0.3rem; }
-    .sum-card.green .sum-val { color: var(--accent); }
-    .sum-card.blue .sum-val  { color: var(--accent2); }
-    .sum-card.amber .sum-val { color: var(--accent3); }
-    .sum-card.purple .sum-val{ color: var(--purple); }
-    .sum-card.red .sum-val   { color: var(--danger); }
-
-    /* ── Main Grid: Pitch + Bench ───────────────── */
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr 280px;
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-    @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
-
-    /* ── Pitch ──────────────────────────────────── */
-    .pitch-wrap {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-      position: relative;
-    }
-    .pitch-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1rem 1.5rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .pitch-title { font-family: var(--font-head); font-size: 1.4rem; letter-spacing: 1px; }
-    .formation-badge {
-      font-family: var(--font-mono); font-size: 0.75rem;
-      padding: 0.3rem 0.8rem; border-radius: 20px;
-      background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.3);
-      color: var(--accent);
+    /* ── Team Colors ─────────────────────────────── */
+    /* Each PL team gets primary+secondary colors */
+    :root{
+      --ARS:#EF0107;--ARS2:#063672;
+      --AVL:#670E36;--AVL2:#95BFE5;
+      --BOU:#DA291C;--BOU2:#000000;
+      --BRE:#E30613;--BRE2:#FFFFFF;
+      --BHA:#0057B8;--BHA2:#FFCD00;
+      --CHE:#034694;--CHE2:#FFFFFF;
+      --CRY:#1B458F;--CRY2:#C4122E;
+      --EVE:#003399;--EVE2:#FFFFFF;
+      --FUL:#CC0000;--FUL2:#FFFFFF;
+      --IPS:#3A64A3;--IPS2:#FFFFFF;
+      --LEI:#003090;--LEI2:#FDBE11;
+      --LIV:#C8102E;--LIV2:#F6EB61;
+      --MCI:#6CABDD;--MCI2:#FFFFFF;
+      --MUN:#DA291C;--MUN2:#FBE122;
+      --NEW:#241F20;--NEW2:#41B6E6;
+      --NFO:#DD0000;--NFO2:#FFFFFF;
+      --SOU:#D71920;--SOU2:#FFFFFF;
+      --TOT:#132257;--TOT2:#FFFFFF;
+      --WHU:#7A263A;--WHU2:#1BB1E7;
+      --WOL:#FDB913;--WOL2:#231F20;
     }
 
-    .pitch {
+    /* ── Navbar ──────────────────────────────────── */
+    nav{
+      position:sticky;top:0;z-index:200;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 1.5rem;height:58px;
+      background:rgba(8,12,20,.95);backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border);
+    }
+    .nav-logo{font-family:var(--font-h);font-size:1.5rem;color:var(--accent);text-decoration:none;letter-spacing:2px}
+    .nav-logo span{color:var(--text)}
+    .nav-links{display:flex;gap:.2rem;list-style:none}
+    .nav-links a{padding:.35rem .8rem;border-radius:6px;text-decoration:none;font-size:.8rem;font-weight:600;color:var(--muted);transition:all .2s}
+    .nav-links a:hover{color:var(--text);background:var(--card)}
+    .nav-links a.active{color:var(--accent);background:rgba(0,212,170,.08)}
+
+    /* ── Page ────────────────────────────────────── */
+    .page{max-width:1300px;margin:0 auto;padding:1.5rem}
+
+    /* ── ID Section ──────────────────────────────── */
+    .id-section{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:14px;padding:1.5rem;margin-bottom:1.5rem;
+      display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;
+    }
+    .id-info{flex:1;min-width:180px}
+    .id-info .label{font-family:var(--font-m);font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem}
+    .id-info h2{font-family:var(--font-h);font-size:1.5rem;letter-spacing:1px}
+    .id-info h2 span{color:var(--accent)}
+    .id-info p{font-size:.78rem;color:var(--muted);margin-top:.25rem;line-height:1.5}
+    .id-info p code{font-family:var(--font-m);font-size:.7rem;color:var(--accent)}
+    .id-form{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+    .id-input{
+      background:var(--card);border:1px solid var(--border);border-radius:8px;
+      padding:.55rem .9rem;color:var(--text);font-family:var(--font-m);font-size:.95rem;
+      width:150px;outline:none;transition:border-color .2s;
+      -moz-appearance:textfield;
+    }
+    .id-input::-webkit-inner-spin-button{-webkit-appearance:none}
+    .id-input:focus{border-color:var(--accent)}
+    .id-input::placeholder{color:var(--muted)}
+    .btn-load{background:var(--accent);color:#080c14;border:none;border-radius:8px;padding:.55rem 1.4rem;font-weight:700;font-size:.85rem;cursor:pointer;transition:all .2s;white-space:nowrap}
+    .btn-load:hover{background:#00f0c0;transform:translateY(-1px)}
+    .btn-load:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .btn-demo{background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:.5rem .9rem;font-size:.78rem;cursor:pointer;transition:all .2s}
+    .btn-demo:hover{border-color:var(--amber);color:var(--amber)}
+
+    /* ── Status ──────────────────────────────────── */
+    .status-bar{
+      display:flex;align-items:center;gap:.6rem;
+      font-family:var(--font-m);font-size:.7rem;
+      padding:.4rem 1rem;border-radius:20px;
+      background:var(--card);border:1px solid var(--border);
+      width:fit-content;margin-bottom:1.5rem;
+    }
+    .s-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+    .s-dot.idle{background:var(--muted)}
+    .s-dot.loading{background:var(--amber);animation:pulse 1s infinite}
+    .s-dot.ok{background:var(--accent)}
+    .s-dot.error{background:var(--danger)}
+
+    /* ── Summary Cards ───────────────────────────── */
+    .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.85rem;margin-bottom:1.5rem}
+    .sum-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.1rem;text-align:center;position:relative;overflow:hidden}
+    .sum-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--c,var(--accent))}
+    .sum-val{font-family:var(--font-h);font-size:2rem;letter-spacing:1px;line-height:1;color:var(--c,var(--accent))}
+    .sum-key{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-top:.3rem}
+    .sum-card.blue{--c:var(--blue)}.sum-card.amber{--c:var(--amber)}.sum-card.purple{--c:var(--purple)}.sum-card.red{--c:var(--danger)}.sum-card.green2{--c:var(--green)}
+
+    /* ── Main Grid ───────────────────────────────── */
+    .main-grid{display:grid;grid-template-columns:1fr 260px;gap:1rem;margin-bottom:1.5rem}
+    @media(max-width:900px){.main-grid{grid-template-columns:1fr}}
+
+    /* ── Pitch ───────────────────────────────────── */
+    .pitch-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+    .pitch-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;border-bottom:1px solid var(--border)}
+    .pitch-title{font-family:var(--font-h);font-size:1.4rem;letter-spacing:1px}
+    .formation-tag{font-family:var(--font-m);font-size:.72rem;padding:.3rem .8rem;border-radius:20px;background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);color:var(--accent)}
+
+    .pitch{
       background:
-        linear-gradient(180deg,
-          #0d4f2a 0%, #0f5c30 8%, #0d4f2a 8%,
-          #0d4f2a 16%, #0f5c30 16%, #0d4f2a 24%,
-          #0d4f2a 32%, #0f5c30 32%, #0d4f2a 40%,
-          #0d4f2a 48%, #0f5c30 48%, #0d4f2a 56%,
-          #0d4f2a 64%, #0f5c30 64%, #0d4f2a 72%,
-          #0d4f2a 80%, #0f5c30 80%, #0d4f2a 88%,
-          #0d4f2a 96%, #0f5c30 96%);
-      position: relative;
-      padding: 1.5rem 1rem;
-      min-height: 520px;
-      display: flex; flex-direction: column;
+        repeating-linear-gradient(
+          180deg,
+          #0a4a24 0px, #0a4a24 44px,
+          #0b5229 44px, #0b5229 88px
+        );
+      position:relative;
+      padding:1rem .5rem;
+      display:flex;flex-direction:column;gap:.5rem;
+      min-height:480px;
     }
+    /* Pitch lines */
+    .pitch::before{content:'';position:absolute;left:8%;right:8%;top:50%;height:1px;background:rgba(255,255,255,.07)}
+    .pitch::after{content:'';position:absolute;left:50%;top:50%;width:70px;height:70px;border:1px solid rgba(255,255,255,.07);border-radius:50%;transform:translate(-50%,-50%)}
+    .pitch-goal-t,.pitch-goal-b{position:absolute;left:33%;right:33%;height:16px;border:1px solid rgba(255,255,255,.1)}
+    .pitch-goal-t{top:0;border-top:none}
+    .pitch-goal-b{bottom:0;border-bottom:none}
 
-    /* pitch markings */
-    .pitch::before {
-      content: '';
-      position: absolute;
-      left: 50%; top: 0; bottom: 0;
-      width: 1px;
-      background: rgba(255,255,255,0.07);
-      transform: translateX(-50%);
-    }
-    .pitch::after {
-      content: '';
-      position: absolute;
-      left: 50%; top: 50%;
-      width: 80px; height: 80px;
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-    }
+    /* ── Player Row ──────────────────────────────── */
+    .player-row{display:flex;justify-content:center;align-items:center;gap:.25rem;flex:1}
 
-    /* pitch lines */
-    .pitch-line {
-      position: absolute;
-      left: 10%; right: 10%;
-      height: 1px;
-      background: rgba(255,255,255,0.07);
+    /* ── Player Card ─────────────────────────────── */
+    .player-card{
+      display:flex;flex-direction:column;align-items:center;gap:.2rem;
+      width:82px;cursor:pointer;position:relative;z-index:2;
     }
-    .pitch-line.top    { top: 18%; }
-    .pitch-line.mid    { top: 50%; }
-    .pitch-line.bottom { bottom: 18%; }
+    .player-card:hover .jersey-wrap{transform:scale(1.08)}
 
-    .pitch-goal {
-      position: absolute;
-      left: 35%; right: 35%;
-      height: 3%;
-      border: 1px solid rgba(255,255,255,0.1);
+    /* Jersey SVG wrapper */
+    .jersey-wrap{
+      width:56px;height:56px;position:relative;
+      transition:transform .2s;flex-shrink:0;
     }
-    .pitch-goal.top    { top: 0; border-top: none; }
-    .pitch-goal.bottom { bottom: 0; border-bottom: none; }
+    .jersey-svg{width:100%;height:100%}
 
-    /* ── Player Rows ────────────────────────────── */
-    .player-row {
-      display: flex;
-      justify-content: center;
-      gap: 0.5rem;
-      flex: 1;
-      align-items: center;
+    /* Captain/VC badge */
+    .badge-cap,.badge-vc{
+      position:absolute;top:-4px;right:-4px;
+      width:17px;height:17px;border-radius:50%;
+      font-size:.55rem;font-weight:900;
+      display:flex;align-items:center;justify-content:center;
+      border:1.5px solid var(--bg);font-family:var(--font-h);
+      letter-spacing:0;z-index:3;
     }
+    .badge-cap{background:var(--amber);color:#000}
+    .badge-vc{background:var(--muted);color:#fff}
 
-    .player-card {
-      display: flex; flex-direction: column; align-items: center;
-      gap: 0.3rem; width: 80px; cursor: pointer;
-      position: relative; z-index: 2;
+    /* Points bubble */
+    .pts-bubble{
+      position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);
+      background:var(--accent);color:#080c14;
+      font-family:var(--font-m);font-size:.5rem;font-weight:700;
+      padding:1px 5px;border-radius:10px;white-space:nowrap;z-index:3;
     }
-    .player-avatar {
-      width: 54px; height: 54px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 0.75rem; font-family: var(--font-mono);
-      border: 2px solid rgba(255,255,255,0.15);
-      position: relative; transition: all 0.2s;
-      background: var(--pos-bg, #1a2235);
-      color: var(--pos-color, var(--text));
-    }
-    .player-card:hover .player-avatar {
-      transform: scale(1.1);
-      border-color: var(--pos-color, var(--accent));
-      box-shadow: 0 0 16px rgba(0,212,170,0.3);
-    }
+    .pts-bubble.cap-pts{background:var(--amber)}
 
-    /* position colors */
-    .pos-GKP { --pos-bg: #1a1f35; --pos-color: #facc15; }
-    .pos-DEF { --pos-bg: #0f2d1a; --pos-color: #00d4aa; }
-    .pos-MID { --pos-bg: #1a1a35; --pos-color: #3b82f6; }
-    .pos-FWD { --pos-bg: #2d0f0f; --pos-color: #ef4444; }
+    .player-name-tag{
+      font-size:.62rem;font-weight:700;text-align:center;
+      color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.9);
+      background:rgba(0,0,0,.6);padding:1px 5px;border-radius:4px;
+      line-height:1.2;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .player-price-tag{font-family:var(--font-m);font-size:.55rem;color:rgba(255,255,255,.55)}
 
-    /* captain / vc badges */
-    .badge-c, .badge-vc {
-      position: absolute; top: -4px; right: -4px;
-      width: 18px; height: 18px; border-radius: 50%;
-      font-size: 0.55rem; font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      border: 1.5px solid var(--bg);
-    }
-    .badge-c  { background: var(--accent3); color: #0a0e1a; }
-    .badge-vc { background: var(--muted);   color: #0a0e1a; }
+    /* ── Bench Panel ─────────────────────────────── */
+    .bench-panel{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+    .bench-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .bench-title{font-family:var(--font-h);font-size:1.3rem;letter-spacing:1px}
+    .bench-tag{font-family:var(--font-m);font-size:.62rem;padding:.25rem .7rem;border-radius:20px;background:rgba(100,116,139,.1);border:1px solid rgba(100,116,139,.2);color:var(--muted)}
 
-    .player-pts-bubble {
-      position: absolute; bottom: -6px; left: 50%;
-      transform: translateX(-50%);
-      background: var(--accent); color: #0a0e1a;
-      font-family: var(--font-mono); font-size: 0.55rem; font-weight: 700;
-      padding: 1px 5px; border-radius: 10px;
-      white-space: nowrap;
+    /* Bench players as a horizontal row of 4 */
+    .bench-row{
+      display:grid;grid-template-columns:repeat(4,1fr);
+      gap:.5rem;padding:1rem;flex:1;
     }
+    .bench-card{
+      display:flex;flex-direction:column;align-items:center;gap:.3rem;
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:10px;padding:.75rem .4rem;
+      cursor:pointer;transition:border-color .2s;
+      position:relative;
+    }
+    .bench-card:hover{border-color:var(--accent)}
+    .bench-num{
+      position:absolute;top:5px;left:7px;
+      font-family:var(--font-m);font-size:.55rem;color:var(--muted);
+    }
+    .bench-jersey{width:44px;height:44px;flex-shrink:0}
+    .bench-name{font-size:.62rem;font-weight:700;text-align:center;line-height:1.2;color:var(--text)}
+    .bench-meta{font-family:var(--font-m);font-size:.55rem;color:var(--muted);text-align:center}
+    .bench-pts{font-family:var(--font-h);font-size:1.2rem;color:var(--accent);letter-spacing:1px}
 
-    .player-name {
-      font-size: 0.68rem; font-weight: 600; text-align: center;
-      color: white; text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-      line-height: 1.2; max-width: 75px;
-      background: rgba(0,0,0,0.55);
-      padding: 1px 4px; border-radius: 4px;
-    }
-    .player-price {
-      font-family: var(--font-mono); font-size: 0.6rem;
-      color: rgba(255,255,255,0.6);
-    }
-
-    /* ── Bench Panel ────────────────────────────── */
-    .bench-panel {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    .bench-header {
-      padding: 1rem 1.5rem;
-      border-bottom: 1px solid var(--border);
-      font-family: var(--font-head); font-size: 1.4rem; letter-spacing: 1px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .bench-list { padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
-
-    .bench-item {
-      display: flex; align-items: center; gap: 0.75rem;
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 10px; padding: 0.75rem 1rem;
-      transition: border-color 0.2s; cursor: pointer;
-    }
-    .bench-item:hover { border-color: var(--accent); }
-    .bench-num {
-      font-family: var(--font-mono); font-size: 0.7rem;
-      color: var(--muted); width: 20px; text-align: center;
-    }
-    .bench-avatar {
-      width: 36px; height: 36px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.65rem; font-weight: 700;
-      border: 1.5px solid rgba(255,255,255,0.1);
-      background: var(--pos-bg, var(--card));
-      color: var(--pos-color, var(--text));
-      flex-shrink: 0;
-    }
-    .bench-info { flex: 1; }
-    .bench-name { font-size: 0.85rem; font-weight: 600; }
-    .bench-meta { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); }
-    .bench-pts {
-      font-family: var(--font-head); font-size: 1.3rem;
-      color: var(--accent); letter-spacing: 1px;
-    }
-
-    /* ── Hot Players ─────────────────────────────── */
-    .hot-section { margin-bottom: 2rem; }
-    .hot-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem; }
-    .hot-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-    .hot-tab {
-      font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 1px;
-      padding: 0.3rem 0.8rem; border-radius: 20px; cursor: pointer;
-      border: 1px solid var(--border); color: var(--muted);
-      background: transparent; transition: all 0.2s;
-    }
-    .hot-tab.active { border-color: var(--accent3); color: var(--accent3); background: rgba(245,158,11,0.1); }
-
-    .hot-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 1rem;
-    }
-    .hot-card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 12px; padding: 1.25rem;
-      position: relative; overflow: hidden; transition: all 0.25s;
-    }
-    .hot-card:hover {
-      border-color: var(--accent3);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    }
-    .hot-rank {
-      position: absolute; top: 1rem; right: 1rem;
-      font-family: var(--font-head); font-size: 2.5rem;
-      color: rgba(255,255,255,0.04); line-height: 1;
-    }
-    .hot-pos-tag {
-      font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 1.5px;
-      padding: 0.15rem 0.5rem; border-radius: 4px; margin-bottom: 0.5rem;
-      display: inline-block;
-    }
-    .hot-pos-tag.GKP { background: rgba(250,204,21,0.15); color: #facc15; }
-    .hot-pos-tag.DEF { background: rgba(0,212,170,0.15); color: var(--accent); }
-    .hot-pos-tag.MID { background: rgba(59,130,246,0.15); color: var(--accent2); }
-    .hot-pos-tag.FWD { background: rgba(239,68,68,0.15); color: var(--danger); }
-
-    .hot-name { font-size: 1rem; font-weight: 700; margin-bottom: 0.2rem; }
-    .hot-club { font-size: 0.72rem; color: var(--muted); margin-bottom: 1rem; }
-
-    .hot-stats { display: flex; flex-direction: column; gap: 0.5rem; }
-    .hot-stat-row {
-      display: flex; align-items: center; justify-content: space-between;
-      font-size: 0.75rem;
-    }
-    .hot-stat-key { color: var(--muted); }
-    .hot-stat-val { font-family: var(--font-mono); font-weight: 700; }
-    .hot-stat-val.form  { color: var(--accent3); }
-    .hot-stat-val.price { color: var(--accent); }
-    .hot-stat-val.own   { color: var(--accent2); }
-
-    .fdr-pip {
-      display: inline-block;
-      width: 10px; height: 10px; border-radius: 2px;
-      margin-right: 3px; vertical-align: middle;
-    }
-    .fdr-1 { background: var(--fdr1); }
-    .fdr-2 { background: var(--fdr2); }
-    .fdr-3 { background: var(--fdr3); }
-    .fdr-4 { background: var(--fdr4); }
-    .fdr-5 { background: var(--fdr5); }
-
-    .price-change {
-      font-family: var(--font-mono); font-size: 0.65rem;
-      padding: 0.1rem 0.4rem; border-radius: 4px;
-    }
-    .price-change.up   { background: rgba(0,212,170,0.15); color: var(--accent); }
-    .price-change.down { background: rgba(239,68,68,0.15); color: var(--danger); }
-    .price-change.flat { background: rgba(100,116,139,0.15); color: var(--muted); }
-
-    /* ── Placeholder / Empty state ───────────────── */
-    .empty-state {
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; padding: 4rem 2rem; text-align: center;
-      color: var(--muted);
-    }
-    .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
-    .empty-title { font-family: var(--font-head); font-size: 1.5rem; letter-spacing: 1px; margin-bottom: 0.5rem; }
-    .empty-sub { font-size: 0.85rem; line-height: 1.6; }
+    /* Extra bench info below row */
+    .bench-extra{padding:.75rem 1rem;border-top:1px solid var(--border)}
+    .bench-extra-title{font-family:var(--font-m);font-size:.58rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:.5rem}
+    .bench-extra-list{display:flex;flex-direction:column;gap:.4rem}
+    .bench-extra-item{display:flex;align-items:center;gap:.6rem;padding:.4rem .6rem;background:var(--card2);border-radius:6px}
+    .bex-pos{font-family:var(--font-m);font-size:.58rem;padding:.1rem .4rem;border-radius:3px;flex-shrink:0}
+    .bex-pos.GKP{background:rgba(250,204,21,.15);color:#facc15}
+    .bex-pos.DEF{background:rgba(0,212,170,.15);color:var(--accent)}
+    .bex-pos.MID{background:rgba(59,130,246,.15);color:var(--blue)}
+    .bex-pos.FWD{background:rgba(239,68,68,.15);color:var(--danger)}
+    .bex-name{font-size:.75rem;font-weight:600;flex:1}
+    .bex-pts{font-family:var(--font-m);font-size:.72rem;color:var(--accent)}
 
     /* ── Tooltip ─────────────────────────────────── */
-    .tooltip-overlay {
-      display: none;
-      position: fixed; inset: 0; z-index: 200;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(4px);
-      align-items: center; justify-content: center;
-    }
-    .tooltip-overlay.show { display: flex; }
-    .tooltip-box {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 2rem; width: 340px; max-width: 90vw;
-      position: relative;
-    }
-    .tooltip-close {
-      position: absolute; top: 1rem; right: 1rem;
-      background: none; border: none; color: var(--muted);
-      font-size: 1.2rem; cursor: pointer;
-    }
-    .tbox-pos { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); margin-bottom: 0.4rem; }
-    .tbox-name { font-family: var(--font-head); font-size: 1.8rem; letter-spacing: 1px; margin-bottom: 0.2rem; }
-    .tbox-club { font-size: 0.8rem; color: var(--muted); margin-bottom: 1.25rem; }
-    .tbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-    .tbox-stat { background: var(--surface); border-radius: 8px; padding: 0.75rem; text-align: center; }
-    .tbox-val { font-family: var(--font-head); font-size: 1.5rem; letter-spacing: 1px; }
-    .tbox-key { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.2rem; }
+    .tooltip-overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);align-items:center;justify-content:center}
+    .tooltip-overlay.show{display:flex}
+    .tooltip-box{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:2rem;width:340px;max-width:92vw;position:relative}
+    .tt-close{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;transition:color .2s}
+    .tt-close:hover{color:var(--text)}
+    .tt-jersey{width:72px;height:72px;margin:0 auto .75rem}
+    .tt-pos{font-family:var(--font-m);font-size:.6rem;color:var(--muted);text-align:center;margin-bottom:.3rem}
+    .tt-name{font-family:var(--font-h);font-size:1.8rem;letter-spacing:1px;text-align:center;margin-bottom:.15rem}
+    .tt-club{font-size:.78rem;color:var(--muted);text-align:center;margin-bottom:1.25rem}
+    .tt-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+    .tt-stat{background:var(--surface);border-radius:8px;padding:.7rem;text-align:center}
+    .tt-val{font-family:var(--font-h);font-size:1.5rem;letter-spacing:1px}
+    .tt-key{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:.2rem}
+
+    /* ── Hot Players ─────────────────────────────── */
+    .hot-section{margin-bottom:1.5rem}
+    .hot-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem}
+    .section-label{font-family:var(--font-m);font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem}
+    .section-title{font-family:var(--font-h);font-size:2rem;letter-spacing:2px;line-height:1}
+    .section-title span{color:var(--amber)}
+    .hot-tabs{display:flex;gap:.4rem;flex-wrap:wrap}
+    .hot-tab{font-family:var(--font-m);font-size:.62rem;letter-spacing:1px;padding:.3rem .75rem;border-radius:20px;cursor:pointer;border:1px solid var(--border);color:var(--muted);background:transparent;transition:all .2s}
+    .hot-tab.active{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,.08)}
+
+    .hot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.85rem}
+    .hot-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.1rem;position:relative;overflow:hidden;transition:all .25s;cursor:pointer}
+    .hot-card:hover{border-color:var(--amber);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+    .hot-rank-bg{position:absolute;top:.75rem;right:.75rem;font-family:var(--font-h);font-size:2.5rem;color:rgba(255,255,255,.04);line-height:1}
+    .hot-jersey-sm{width:40px;height:40px;float:left;margin:0 .75rem .25rem 0}
+    .hot-pos-tag{font-family:var(--font-m);font-size:.58rem;letter-spacing:1.5px;padding:.12rem .45rem;border-radius:3px;display:inline-block;margin-bottom:.35rem}
+    .hot-pos-tag.GKP{background:rgba(250,204,21,.15);color:#facc15}
+    .hot-pos-tag.DEF{background:rgba(0,212,170,.15);color:var(--accent)}
+    .hot-pos-tag.MID{background:rgba(59,130,246,.15);color:var(--blue)}
+    .hot-pos-tag.FWD{background:rgba(239,68,68,.15);color:var(--danger)}
+    .hot-name{font-size:.9rem;font-weight:700;margin-bottom:.1rem}
+    .hot-club{font-size:.68rem;color:var(--muted);margin-bottom:.75rem;clear:both}
+    .hot-stats{display:flex;flex-direction:column;gap:.4rem}
+    .hot-stat-row{display:flex;align-items:center;justify-content:space-between;font-size:.72rem}
+    .hot-stat-key{color:var(--muted)}
+    .hot-stat-val{font-family:var(--font-m);font-weight:700}
+    .hot-stat-val.form{color:var(--amber)}
+    .hot-stat-val.price{color:var(--accent)}
+    .hot-stat-val.own{color:var(--blue)}
+    .pc-up{background:rgba(0,212,170,.12);color:var(--accent);font-family:var(--font-m);font-size:.6rem;padding:1px 5px;border-radius:3px}
+    .pc-dn{background:rgba(239,68,68,.12);color:var(--danger);font-family:var(--font-m);font-size:.6rem;padding:1px 5px;border-radius:3px}
+    .pc-fl{background:rgba(100,116,139,.1);color:var(--muted);font-family:var(--font-m);font-size:.6rem;padding:1px 5px;border-radius:3px}
+    .fdr-pip{display:inline-block;width:9px;height:9px;border-radius:2px}
+    .fdr-1,.fdr-2{background:var(--accent)}.fdr-3{background:var(--amber)}.fdr-4,.fdr-5{background:var(--danger)}
+
+    /* ── Empty ───────────────────────────────────── */
+    .empty-pitch{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:3rem;color:var(--muted);text-align:center}
+    .empty-pitch .ei{font-size:2.5rem;opacity:.4;margin-bottom:.75rem}
+    .empty-pitch .et{font-family:var(--font-h);font-size:1.3rem;letter-spacing:1px}
 
     /* ── Animations ──────────────────────────────── */
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-    .fade-in { animation: fadeIn 0.4s ease forwards; }
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadeUp .35s ease both}
 
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar{width:4px}
+    ::-webkit-scrollbar-track{background:var(--bg)}
+    ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
   </style>
 </head>
 <body>
+
+<!-- ── Tooltip ─────────────────────────────────────── -->
+<div class="tooltip-overlay" id="tooltip" onclick="closeTT(event)">
+  <div class="tooltip-box">
+    <button class="tt-close" onclick="document.getElementById('tooltip').classList.remove('show')">✕</button>
+    <svg class="tt-jersey" id="tt-jersey-svg" viewBox="0 0 100 80"></svg>
+    <div class="tt-pos" id="tt-pos">MID · ARS</div>
+    <div class="tt-name" id="tt-name">Player</div>
+    <div class="tt-club" id="tt-club">Club · £0.0m</div>
+    <div class="tt-grid">
+      <div class="tt-stat"><div class="tt-val" id="tt-gw" style="color:var(--accent)">0</div><div class="tt-key">GW Pts</div></div>
+      <div class="tt-stat"><div class="tt-val" id="tt-tot" style="color:var(--blue)">0</div><div class="tt-key">Total Pts</div></div>
+      <div class="tt-stat"><div class="tt-val" id="tt-form" style="color:var(--amber)">0.0</div><div class="tt-key">Form</div></div>
+      <div class="tt-stat"><div class="tt-val" id="tt-own" style="color:var(--purple)">0%</div><div class="tt-key">Owned By</div></div>
+    </div>
+  </div>
+</div>
 
 <!-- ── Navbar ──────────────────────────────────────── -->
 <nav>
@@ -480,111 +324,56 @@
   </ul>
 </nav>
 
-<!-- ── Player Detail Tooltip ───────────────────────── -->
-<div class="tooltip-overlay" id="playerTooltip" onclick="closeTooltip(event)">
-  <div class="tooltip-box">
-    <button class="tooltip-close" onclick="document.getElementById('playerTooltip').classList.remove('show')">✕</button>
-    <div class="tbox-pos" id="tt-pos">MID</div>
-    <div class="tbox-name" id="tt-name">Player Name</div>
-    <div class="tbox-club" id="tt-club">Club · £8.5m</div>
-    <div class="tbox-grid">
-      <div class="tbox-stat">
-        <div class="tbox-val" id="tt-pts" style="color:var(--accent)">0</div>
-        <div class="tbox-key">GW Points</div>
-      </div>
-      <div class="tbox-stat">
-        <div class="tbox-val" id="tt-total" style="color:var(--accent2)">0</div>
-        <div class="tbox-key">Total Pts</div>
-      </div>
-      <div class="tbox-stat">
-        <div class="tbox-val" id="tt-form" style="color:var(--accent3)">0.0</div>
-        <div class="tbox-key">Form</div>
-      </div>
-      <div class="tbox-stat">
-        <div class="tbox-val" id="tt-own" style="color:var(--purple)">0%</div>
-        <div class="tbox-key">Ownership</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ── Page ────────────────────────────────────────── -->
 <div class="page">
 
   <!-- ID Input -->
   <div class="id-section">
     <div class="id-info">
       <div class="label">// fpl team id</div>
-      <h2 style="font-family:var(--font-head);font-size:1.6rem;letter-spacing:1px;">LOAD YOUR <span style="color:var(--accent)">SQUAD</span></h2>
-      <p>Enter your FPL Team ID to load squad. Find it at:<br>
-         <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--accent)">
-           fantasy.premierleague.com → Pick Team → URL → /entry/<strong>ID</strong>/
-         </span>
-      </p>
+      <h2>LOAD YOUR <span>SQUAD</span></h2>
+      <p>FPL Team ID ရှာနည်း: <code>fantasy.premierleague.com → Pick Team → URL /entry/<strong>ID</strong>/</code></p>
     </div>
     <div class="id-form">
-      <input type="number" class="id-input" id="teamIdInput" placeholder="e.g. 1234567" min="1" />
+      <input type="number" class="id-input" id="teamId" placeholder="e.g. 1234567" min="1"/>
       <button class="btn-load" id="loadBtn" onclick="loadTeam()">LOAD TEAM</button>
-      <button class="btn-demo" onclick="loadDemo()">Demo Mode</button>
+      <button class="btn-demo" onclick="loadDemo()">Demo</button>
     </div>
   </div>
 
   <!-- Status -->
   <div class="status-bar" id="statusBar">
-    <div class="status-dot idle" id="statusDot"></div>
-    <span id="statusText">Enter your Team ID above to get started</span>
+    <div class="s-dot idle" id="sDot"></div>
+    <span id="sTxt">Team ID ထည့်ပြီး Load Team နှိပ်ပါ</span>
   </div>
 
-  <!-- Summary Cards -->
+  <!-- Summary -->
   <div class="summary-grid" id="summaryGrid" style="display:none">
-    <div class="sum-card green">
-      <div class="sum-val" id="s-gwpts">—</div>
-      <div class="sum-label">GW Points</div>
-    </div>
-    <div class="sum-card blue">
-      <div class="sum-val" id="s-total">—</div>
-      <div class="sum-label">Total Points</div>
-    </div>
-    <div class="sum-card amber">
-      <div class="sum-val" id="s-rank">—</div>
-      <div class="sum-label">Overall Rank</div>
-    </div>
-    <div class="sum-card purple">
-      <div class="sum-val" id="s-gw">—</div>
-      <div class="sum-label">Gameweek</div>
-    </div>
-    <div class="sum-card red">
-      <div class="sum-val" id="s-tv">—</div>
-      <div class="sum-label">Team Value</div>
-    </div>
-    <div class="sum-card green" style="--card:var(--surface)">
-      <div class="sum-val" id="s-bank">—</div>
-      <div class="sum-label">In Bank</div>
-    </div>
+    <div class="sum-card"><div class="sum-val" id="s-gw">—</div><div class="sum-key">GW Points</div></div>
+    <div class="sum-card blue"><div class="sum-val" id="s-tot">—</div><div class="sum-key">Total Points</div></div>
+    <div class="sum-card amber"><div class="sum-val" id="s-rank">—</div><div class="sum-key">Overall Rank</div></div>
+    <div class="sum-card purple"><div class="sum-val" id="s-gwn">—</div><div class="sum-key">Gameweek</div></div>
+    <div class="sum-card red"><div class="sum-val" id="s-tv">—</div><div class="sum-key">Team Value</div></div>
+    <div class="sum-card green2"><div class="sum-val" id="s-bank">—</div><div class="sum-key">In Bank</div></div>
   </div>
 
-  <!-- Main Grid: Pitch + Bench -->
+  <!-- Main: Pitch + Bench -->
   <div class="main-grid" id="mainGrid" style="display:none">
 
     <!-- Pitch -->
     <div class="pitch-wrap">
       <div class="pitch-header">
         <div>
-          <div class="label">// starting xi</div>
-          <div class="pitch-title" id="teamName">YOUR TEAM</div>
+          <div style="font-family:var(--font-m);font-size:.58rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:.2rem">// Starting XI</div>
+          <div class="pitch-title" id="teamNameDisplay">YOUR TEAM</div>
         </div>
-        <div class="formation-badge" id="formationBadge">—</div>
+        <div class="formation-tag" id="formationDisplay">—</div>
       </div>
       <div class="pitch" id="pitchArea">
-        <div class="pitch-line top"></div>
-        <div class="pitch-line bottom"></div>
-        <div class="pitch-goal top"></div>
-        <div class="pitch-goal bottom"></div>
-        <!-- rows rendered by JS -->
-        <div class="empty-state" id="pitchEmpty">
-          <div class="empty-icon">⚽</div>
-          <div class="empty-title">NO SQUAD LOADED</div>
-          <div class="empty-sub">Enter your Team ID and click Load Team</div>
+        <div class="pitch-goal-t"></div>
+        <div class="pitch-goal-b"></div>
+        <div class="empty-pitch" id="pitchEmpty">
+          <div class="ei">⚽</div>
+          <div class="et">NO SQUAD LOADED</div>
         </div>
       </div>
     </div>
@@ -592,31 +381,32 @@
     <!-- Bench -->
     <div class="bench-panel">
       <div class="bench-header">
-        <span>BENCH</span>
-        <span class="formation-badge" style="background:rgba(100,116,139,0.1);border-color:rgba(100,116,139,0.3);color:var(--muted);">4 SUB</span>
+        <span class="bench-title">BENCH</span>
+        <span class="bench-tag">4 SUBS</span>
       </div>
-      <div class="bench-list" id="benchList">
-        <div class="empty-state" style="padding:2rem;">
-          <div class="empty-icon" style="font-size:2rem;">🪑</div>
-          <div class="empty-sub">Bench will appear here</div>
-        </div>
+      <!-- 4 jerseys in a row -->
+      <div class="bench-row" id="benchRow"></div>
+      <!-- Detail list below -->
+      <div class="bench-extra" id="benchExtra">
+        <div class="bench-extra-title">Bench Details</div>
+        <div class="bench-extra-list" id="benchExtraList"></div>
       </div>
     </div>
 
   </div>
 
-  <!-- Hot Players Section -->
+  <!-- Hot Players -->
   <div class="hot-section" id="hotSection" style="display:none">
-    <div class="hot-header">
+    <div class="hot-head">
       <div>
-        <div class="label">// this gameweek</div>
-        <h2 class="section-title">🔥 HOT <span>PLAYERS</span></h2>
+        <div class="section-label">// this gameweek</div>
+        <div class="section-title">🔥 HOT <span>PLAYERS</span></div>
       </div>
       <div class="hot-tabs">
-        <button class="hot-tab active" data-sort="form" onclick="sortHot('form',this)">FORM</button>
-        <button class="hot-tab" data-sort="price" onclick="sortHot('price',this)">PRICE</button>
-        <button class="hot-tab" data-sort="own" onclick="sortHot('own',this)">OWNERSHIP</button>
-        <button class="hot-tab" data-sort="fdr" onclick="sortHot('fdr',this)">EASY FDR</button>
+        <button class="hot-tab active" onclick="sortHot('form',this)">FORM</button>
+        <button class="hot-tab" onclick="sortHot('price',this)">PRICE ▲</button>
+        <button class="hot-tab" onclick="sortHot('own',this)">OWNERSHIP</button>
+        <button class="hot-tab" onclick="sortHot('fdr',this)">EASY FDR</button>
       </div>
     </div>
     <div class="hot-grid" id="hotGrid"></div>
@@ -624,456 +414,493 @@
 
 </div><!-- /page -->
 
-<footer style="border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:0.72rem;color:var(--muted);">
-  FPL Hub · Data via FPL API (fpl-proxy) + Static fallback · <a href="../index.html" style="color:var(--accent);text-decoration:none;">← Home</a>
+<footer style="border-top:1px solid var(--border);padding:1.25rem 2rem;text-align:center;font-size:.7rem;color:var(--muted)">
+  FPL Hub · <a href="../index.html" style="color:var(--accent);text-decoration:none">← Home</a>
 </footer>
 
 <script>
-// ═══════════════════════════════════════════════════════
-//  CONFIG
-// ═══════════════════════════════════════════════════════
-// CORS proxy options (try in order):
-const PROXIES = [
-  'https://corsproxy.io/?',
-  'https://api.allorigins.win/raw?url=',
-];
-const FPL_BASE = 'https://fantasy.premierleague.com/api';
+// ═══════════════════════════════════════════════════
+//  TEAM COLORS — Premier League 2024/25
+// ═══════════════════════════════════════════════════
+const TEAM_COLORS = {
+  ARS:{p:'#EF0107',s:'#063672',n:'Arsenal'},
+  AVL:{p:'#670E36',s:'#95BFE5',n:'Aston Villa'},
+  BOU:{p:'#DA291C',s:'#000000',n:'Bournemouth'},
+  BRE:{p:'#E30613',s:'#FFFFFF',n:'Brentford'},
+  BHA:{p:'#0057B8',s:'#FFCD00',n:'Brighton'},
+  CHE:{p:'#034694',s:'#FFFFFF',n:'Chelsea'},
+  CRY:{p:'#1B458F',s:'#C4122E',n:'Crystal Palace'},
+  EVE:{p:'#003399',s:'#FFFFFF',n:'Everton'},
+  FUL:{p:'#CC0000',s:'#FFFFFF',n:'Fulham'},
+  IPS:{p:'#3A64A3',s:'#FFFFFF',n:'Ipswich'},
+  LEI:{p:'#003090',s:'#FDBE11',n:'Leicester'},
+  LIV:{p:'#C8102E',s:'#F6EB61',n:'Liverpool'},
+  MCI:{p:'#6CABDD',s:'#FFFFFF',n:'Man City'},
+  MUN:{p:'#DA291C',s:'#FBE122',n:'Man United'},
+  NEW:{p:'#241F20',s:'#41B6E6',n:'Newcastle'},
+  NFO:{p:'#DD0000',s:'#FFFFFF',n:'Nott\'m Forest'},
+  SOU:{p:'#D71920',s:'#FFFFFF',n:'Southampton'},
+  TOT:{p:'#132257',s:'#FFFFFF',n:'Tottenham'},
+  WHU:{p:'#7A263A',s:'#1BB1E7',n:'West Ham'},
+  WOL:{p:'#FDB913',s:'#231F20',n:'Wolves'},
+};
 
-// Positions
-const POS = { 1:'GKP', 2:'DEF', 3:'MID', 4:'FWD' };
-
-// Club short names (id → short)
-const CLUBS = {
+// FPL team id → short code
+const TEAM_SHORT = {
   1:'ARS',2:'AVL',3:'BOU',4:'BRE',5:'BHA',6:'CHE',7:'CRY',8:'EVE',
   9:'FUL',10:'IPS',11:'LEI',12:'LIV',13:'LUT',14:'MCI',15:'MUN',
   16:'NEW',17:'NFO',18:'SHU',19:'SOU',20:'TOT',21:'WHU',22:'WOL'
 };
+const POS = {1:'GKP',2:'DEF',3:'MID',4:'FWD'};
+const PROXIES = ['https://corsproxy.io/?','https://api.allorigins.win/raw?url='];
+const FPL = 'https://fantasy.premierleague.com/api';
 
-// ═══════════════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════════════
-let allPlayers   = {};   // id → player data from bootstrap
-let allTeams     = {};   // id → team data
-let hotPlayers   = [];   // array for hot section
-let currentSort  = 'form';
-let loadedTeam   = null; // loaded picks data
+let allPlayers={}, allTeams={}, hotPlayers=[];
 
-// ═══════════════════════════════════════════════════════
-//  STATUS HELPERS
-// ═══════════════════════════════════════════════════════
-function setStatus(state, msg) {
-  const dot  = document.getElementById('statusDot');
-  const text = document.getElementById('statusText');
-  dot.className  = `status-dot ${state}`;
-  text.textContent = msg;
+// ═══════════════════════════════════════════════════
+//  JERSEY SVG GENERATOR
+// ═══════════════════════════════════════════════════
+function jerseyPath(primary, secondary, pos) {
+  // Different jersey styles per position
+  if (pos === 'GKP') {
+    // GK: different collar, solid color
+    return `
+      <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="jg${pos}" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="${primary}"/>
+            <stop offset="100%" stop-color="${primary}dd"/>
+          </linearGradient>
+        </defs>
+        <!-- Body -->
+        <path d="M20,12 L10,30 L22,33 L22,72 L78,72 L78,33 L90,30 L80,12 L68,18 Q50,24 32,18 Z"
+              fill="url(#jg${pos})" stroke="${secondary}22" stroke-width="1"/>
+        <!-- Sleeves -->
+        <path d="M20,12 L10,30 L22,33 L22,22 Q20,16 20,12Z" fill="${secondary}44"/>
+        <path d="M80,12 L90,30 L78,33 L78,22 Q80,16 80,12Z" fill="${secondary}44"/>
+        <!-- Collar round GK -->
+        <ellipse cx="50" cy="16" rx="10" ry="5" fill="${secondary}" opacity=".7"/>
+        <!-- Horizontal stripe -->
+        <rect x="22" y="40" width="56" height="8" fill="${secondary}" opacity=".25"/>
+        <!-- Number area -->
+        <rect x="38" y="48" width="24" height="14" rx="2" fill="${secondary}" opacity=".15"/>
+      </svg>`;
+  }
+  // Outfield jersey
+  return `
+    <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="jg${Math.random().toString(36).slice(2)}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${primary}"/>
+          <stop offset="100%" stop-color="${primary}cc"/>
+        </linearGradient>
+      </defs>
+      <!-- Body -->
+      <path d="M22,10 L10,28 L22,32 L22,72 L78,72 L78,32 L90,28 L78,10 L66,16 Q50,22 34,16 Z"
+            fill="${primary}" stroke="${secondary}33" stroke-width="1"/>
+      <!-- Left sleeve -->
+      <path d="M22,10 L10,28 L22,32 L22,20Z" fill="${secondary}" opacity=".6"/>
+      <!-- Right sleeve -->
+      <path d="M78,10 L90,28 L78,32 L78,20Z" fill="${secondary}" opacity=".6"/>
+      <!-- Collar V-neck -->
+      <path d="M42,12 L50,22 L58,12 Q54,10 50,10 Q46,10 42,12Z" fill="${secondary}" opacity=".8"/>
+      <!-- Shoulder accent lines -->
+      <line x1="22" y1="16" x2="34" y2="16" stroke="${secondary}" stroke-width="1.5" opacity=".5"/>
+      <line x1="78" y1="16" x2="66" y2="16" stroke="${secondary}" stroke-width="1.5" opacity=".5"/>
+      <!-- Shirt number placeholder -->
+      <rect x="40" y="44" width="20" height="16" rx="2" fill="${secondary}" opacity=".18"/>
+    </svg>`;
 }
 
-// ═══════════════════════════════════════════════════════
-//  FETCH WITH PROXY FALLBACK
-// ═══════════════════════════════════════════════════════
-async function fetchFPL(path) {
-  const url = `${FPL_BASE}${path}`;
-  for (const proxy of PROXIES) {
+function makeJerseySVG(teamShort, pos, size=56) {
+  const tc = TEAM_COLORS[teamShort] || {p:'#334155',s:'#94a3b8'};
+  return jerseyPath(tc.p, tc.s, pos);
+}
+
+function jerseyElement(teamShort, pos, cls='jersey-wrap') {
+  const div = document.createElement('div');
+  div.className = cls;
+  div.innerHTML = makeJerseySVG(teamShort, pos);
+  return div;
+}
+
+// ═══════════════════════════════════════════════════
+//  STATUS
+// ═══════════════════════════════════════════════════
+function setStatus(state, msg) {
+  document.getElementById('sDot').className = `s-dot ${state}`;
+  document.getElementById('sTxt').textContent = msg;
+}
+
+// ═══════════════════════════════════════════════════
+//  FETCH WITH PROXY
+// ═══════════════════════════════════════════════════
+async function fplFetch(path) {
+  const url = `${FPL}${path}`;
+  for (const p of PROXIES) {
     try {
-      const res = await fetch(proxy + encodeURIComponent(url));
-      if (res.ok) return await res.json();
+      const r = await fetch(p + encodeURIComponent(url));
+      if (r.ok) return r.json();
     } catch(e) {}
   }
   throw new Error('All proxies failed');
 }
 
-// ═══════════════════════════════════════════════════════
-//  LOAD BOOTSTRAP (player + team data)
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+//  LOAD BOOTSTRAP
+// ═══════════════════════════════════════════════════
 async function loadBootstrap() {
-  const data = await fetchFPL('/bootstrap-static/');
+  const data = await fplFetch('/bootstrap-static/');
   data.elements.forEach(p => { allPlayers[p.id] = p; });
-  data.teams.forEach(t    => { allTeams[t.id]   = t; });
-
-  // Build hot players list (top 12 by form)
+  data.teams.forEach(t => { allTeams[t.id] = t; });
   hotPlayers = data.elements
-    .filter(p => p.minutes > 90)
+    .filter(p => p.minutes > 90 && parseFloat(p.form) > 0)
     .map(p => ({
-      id: p.id,
-      name: p.web_name,
-      fullName: `${p.first_name} ${p.second_name}`,
-      club: CLUBS[p.team] || '?',
-      clubFull: allTeams[p.team]?.name || '',
+      id: p.id, name: p.web_name,
       pos: POS[p.element_type],
-      form: parseFloat(p.form) || 0,
-      price: p.now_cost / 10,
-      priceChange: (p.cost_change_event / 10),
-      own: parseFloat(p.selected_by_percent) || 0,
-      totalPts: p.total_points,
-      gwPts: p.event_points,
-      fdr: 3, // default; ideally fetch fixtures
+      team: TEAM_SHORT[p.team] || 'ARS',
+      teamFull: allTeams[p.team]?.name || '',
+      form: parseFloat(p.form)||0,
+      price: p.now_cost/10,
+      priceChange: p.cost_change_event/10,
+      own: parseFloat(p.selected_by_percent)||0,
+      gwPts: p.event_points||0,
+      totalPts: p.total_points||0,
+      nextFDR: 3,
     }));
-
-  return data;
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 //  LOAD TEAM
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 async function loadTeam() {
-  const id = document.getElementById('teamIdInput').value.trim();
-  if (!id) { setStatus('error','Please enter a Team ID'); return; }
-
+  const id = document.getElementById('teamId').value.trim();
+  if (!id) { setStatus('error','Team ID ထည့်ပါ'); return; }
   const btn = document.getElementById('loadBtn');
-  btn.disabled = true;
-  btn.textContent = 'Loading...';
-  setStatus('loading', `Fetching team #${id}…`);
-
+  btn.disabled = true; btn.textContent = 'Loading…';
   try {
-    // 1. Bootstrap data
-    setStatus('loading','Loading player database…');
+    setStatus('loading','Player database ဆွဲနေသည်…');
     await loadBootstrap();
-
-    // 2. Team entry info
-    setStatus('loading','Loading team info…');
-    const entry = await fetchFPL(`/entry/${id}/`);
-
-    // 3. Current GW picks
+    setStatus('loading','Team info ဆွဲနေသည်…');
+    const entry = await fplFetch(`/entry/${id}/`);
     const gw = entry.current_event;
-    setStatus('loading', `Loading GW${gw} picks…`);
-    const picks = await fetchFPL(`/entry/${id}/event/${gw}/picks/`);
-
-    // Save
-    loadedTeam = { entry, picks, gw };
-
-    // Render
+    setStatus('loading',`GW${gw} picks ဆွဲနေသည်…`);
+    const picks = await fplFetch(`/entry/${id}/event/${gw}/picks/`);
     renderSummary(entry, picks, gw);
     renderPitch(picks.picks, entry.name);
     renderHot('form');
-
-    // Show sections
-    document.getElementById('summaryGrid').style.display = 'grid';
-    document.getElementById('mainGrid').style.display = 'grid';
-    document.getElementById('hotSection').style.display = 'block';
-
-    setStatus('ok', `✓ Loaded: ${entry.name} · GW${gw} · Rank #${entry.summary_overall_rank?.toLocaleString() || '?'}`);
-
-    // Save to localStorage
+    document.getElementById('summaryGrid').style.display='grid';
+    document.getElementById('mainGrid').style.display='grid';
+    document.getElementById('hotSection').style.display='block';
+    setStatus('ok',`✓ ${entry.name} · GW${gw} · ${picks.entry_history?.points||0}pts loaded`);
     localStorage.setItem('fplTeamId', id);
-
   } catch(e) {
-    setStatus('error', `Failed to load: ${e.message}. Try Demo Mode.`);
-    console.error(e);
+    setStatus('error',`Failed: ${e.message} — Demo Mode ကြိုးစားပါ`);
   } finally {
-    btn.disabled = false;
-    btn.textContent = 'LOAD TEAM';
+    btn.disabled=false; btn.textContent='LOAD TEAM';
   }
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 //  RENDER SUMMARY
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 function renderSummary(entry, picks, gw) {
-  document.getElementById('s-gwpts').textContent = picks.entry_history?.points ?? '—';
-  document.getElementById('s-total').textContent = entry.summary_overall_points?.toLocaleString() ?? '—';
-  const rank = entry.summary_overall_rank;
-  document.getElementById('s-rank').textContent = rank ? (rank > 999 ? (rank/1000).toFixed(0)+'K' : rank) : '—';
-  document.getElementById('s-gw').textContent   = `GW${gw}`;
-  const tv   = picks.entry_history?.value ?? 0;
-  const bank = picks.entry_history?.bank  ?? 0;
+  document.getElementById('s-gw').textContent  = picks.entry_history?.points ?? '—';
+  document.getElementById('s-tot').textContent = entry.summary_overall_points?.toLocaleString() ?? '—';
+  const r = entry.summary_overall_rank;
+  document.getElementById('s-rank').textContent = r ? (r>=1000 ? Math.round(r/1000)+'K' : r) : '—';
+  document.getElementById('s-gwn').textContent  = `GW${gw}`;
+  const tv   = picks.entry_history?.value||0;
+  const bank = picks.entry_history?.bank||0;
   document.getElementById('s-tv').textContent   = tv   ? `£${(tv/10).toFixed(1)}m`   : '—';
   document.getElementById('s-bank').textContent = bank ? `£${(bank/10).toFixed(1)}m` : '—';
 }
 
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 //  RENDER PITCH
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 function renderPitch(picks, teamName) {
-  const starters = picks.filter(p => p.position <= 11);
-  const bench    = picks.filter(p => p.position > 11).sort((a,b) => a.position - b.position);
+  const starters = picks.filter(p=>p.position<=11);
+  const bench    = picks.filter(p=>p.position>11).sort((a,b)=>a.position-b.position);
 
-  // Detect formation
-  const defs = starters.filter(p => POS[allPlayers[p.element]?.element_type] === 'DEF').length;
-  const mids = starters.filter(p => POS[allPlayers[p.element]?.element_type] === 'MID').length;
-  const fwds = starters.filter(p => POS[allPlayers[p.element]?.element_type] === 'FWD').length;
-  const formation = `${defs}-${mids}-${fwds}`;
-  document.getElementById('formationBadge').textContent = formation;
-  document.getElementById('teamName').textContent = teamName.toUpperCase();
+  const defs = starters.filter(p=>POS[allPlayers[p.element]?.element_type]==='DEF').length;
+  const mids = starters.filter(p=>POS[allPlayers[p.element]?.element_type]==='MID').length;
+  const fwds = starters.filter(p=>POS[allPlayers[p.element]?.element_type]==='FWD').length;
+  document.getElementById('formationDisplay').textContent = `${defs}-${mids}-${fwds}`;
+  document.getElementById('teamNameDisplay').textContent  = teamName.toUpperCase();
 
-  // Group by position
   const rows = {
-    GKP: starters.filter(p => POS[allPlayers[p.element]?.element_type] === 'GKP'),
-    DEF: starters.filter(p => POS[allPlayers[p.element]?.element_type] === 'DEF'),
-    MID: starters.filter(p => POS[allPlayers[p.element]?.element_type] === 'MID'),
-    FWD: starters.filter(p => POS[allPlayers[p.element]?.element_type] === 'FWD'),
+    FWD: starters.filter(p=>POS[allPlayers[p.element]?.element_type]==='FWD'),
+    MID: starters.filter(p=>POS[allPlayers[p.element]?.element_type]==='MID'),
+    DEF: starters.filter(p=>POS[allPlayers[p.element]?.element_type]==='DEF'),
+    GKP: starters.filter(p=>POS[allPlayers[p.element]?.element_type]==='GKP'),
   };
 
   const pitch = document.getElementById('pitchArea');
-  document.getElementById('pitchEmpty').style.display = 'none';
+  document.getElementById('pitchEmpty').style.display='none';
+  pitch.querySelectorAll('.player-row').forEach(r=>r.remove());
 
-  // Clear old rows
-  pitch.querySelectorAll('.player-row').forEach(r => r.remove());
-
-  // Render rows: FWD top → DEF bottom (attack at top of pitch)
-  ['FWD','MID','DEF','GKP'].forEach(pos => {
-    if (!rows[pos].length) return;
+  ['FWD','MID','DEF','GKP'].forEach(pos=>{
+    if(!rows[pos].length) return;
     const row = document.createElement('div');
-    row.className = 'player-row';
-    rows[pos].forEach(pick => {
+    row.className='player-row';
+    rows[pos].forEach(pick=>{
       const pl = allPlayers[pick.element];
-      if (!pl) return;
+      if(!pl) return;
       row.appendChild(makePlayerCard(pl, pick, pos));
     });
     pitch.appendChild(row);
   });
 
-  // Bench
-  const benchList = document.getElementById('benchList');
-  benchList.innerHTML = '';
-  bench.forEach((pick, i) => {
-    const pl = allPlayers[pick.element];
-    if (!pl) return;
-    const pos = POS[pl.element_type];
-    const item = document.createElement('div');
-    item.className = 'bench-item';
-    item.onclick = () => showPlayerDetail(pl, pick);
-    item.innerHTML = `
-      <div class="bench-num">${i+1}</div>
-      <div class="bench-avatar pos-${pos}">${pl.web_name.slice(0,3).toUpperCase()}</div>
-      <div class="bench-info">
-        <div class="bench-name">${pl.web_name}</div>
-        <div class="bench-meta">${pos} · ${CLUBS[pl.team]||'?'} · £${(pl.now_cost/10).toFixed(1)}m</div>
-      </div>
-      <div class="bench-pts">${pl.event_points ?? 0}</div>
-    `;
-    benchList.appendChild(item);
-  });
+  renderBench(bench);
 }
 
 function makePlayerCard(pl, pick, pos) {
+  const teamShort = TEAM_SHORT[pl.team] || 'ARS';
+  const isCap = pick.is_captain;
+  const isVC  = pick.is_vice_captain;
+  const pts   = pl.event_points||0;
+  const disPts = pts * (pick.multiplier||1);
+
   const card = document.createElement('div');
-  card.className = `player-card pos-${pos}`;
-  card.onclick = () => showPlayerDetail(pl, pick);
+  card.className = 'player-card';
+  card.onclick = ()=>showTT(pl, pick, teamShort, pos);
 
-  const isCap  = pick.is_captain;
-  const isVC   = pick.is_vice_captain;
-  const pts    = pl.event_points ?? 0;
-  const dispPts = isCap ? pts * 2 : pts;
+  const jerseyWrap = jerseyElement(teamShort, pos);
+  // badges
+  if(isCap) {
+    const b=document.createElement('div'); b.className='badge-cap'; b.textContent='C'; jerseyWrap.appendChild(b);
+  }
+  if(isVC) {
+    const b=document.createElement('div'); b.className='badge-vc'; b.textContent='V'; jerseyWrap.appendChild(b);
+  }
+  // pts bubble
+  const pb=document.createElement('div');
+  pb.className='pts-bubble'+(isCap?' cap-pts':'');
+  pb.textContent=disPts+'pts';
+  jerseyWrap.appendChild(pb);
 
-  card.innerHTML = `
-    <div class="player-avatar pos-${pos}">
-      ${pl.web_name.slice(0,3).toUpperCase()}
-      ${isCap  ? '<span class="badge-c">C</span>'  : ''}
-      ${isVC   ? '<span class="badge-vc">V</span>' : ''}
-      <span class="player-pts-bubble">${dispPts}pts</span>
-    </div>
-    <div class="player-name">${pl.web_name}</div>
-    <div class="player-price">£${(pl.now_cost/10).toFixed(1)}m</div>
-  `;
+  card.appendChild(jerseyWrap);
+
+  const nameTag=document.createElement('div'); nameTag.className='player-name-tag'; nameTag.textContent=pl.web_name;
+  const priceTag=document.createElement('div'); priceTag.className='player-price-tag'; priceTag.textContent='£'+(pl.now_cost/10).toFixed(1)+'m';
+  card.appendChild(nameTag);
+  card.appendChild(priceTag);
   return card;
 }
 
-// ═══════════════════════════════════════════════════════
-//  PLAYER DETAIL TOOLTIP
-// ═══════════════════════════════════════════════════════
-function showPlayerDetail(pl, pick) {
-  const pos = POS[pl.element_type];
+// ═══════════════════════════════════════════════════
+//  RENDER BENCH — horizontal row of 4 jerseys
+// ═══════════════════════════════════════════════════
+function renderBench(bench) {
+  const row  = document.getElementById('benchRow');
+  const list = document.getElementById('benchExtraList');
+  row.innerHTML=''; list.innerHTML='';
+
+  bench.forEach((pick, i)=>{
+    const pl = allPlayers[pick.element];
+    if(!pl) return;
+    const pos = POS[pl.element_type];
+    const teamShort = TEAM_SHORT[pl.team]||'ARS';
+    const pts = pl.event_points||0;
+
+    // Jersey card
+    const card=document.createElement('div');
+    card.className='bench-card';
+    card.onclick=()=>showTT(pl, pick, teamShort, pos);
+
+    const num=document.createElement('div'); num.className='bench-num'; num.textContent=i+1;
+    const jEl=jerseyElement(teamShort, pos,'bench-jersey');
+    const nm=document.createElement('div'); nm.className='bench-name'; nm.textContent=pl.web_name;
+    const mt=document.createElement('div'); mt.className='bench-meta'; mt.textContent=pos+' · '+teamShort;
+    const pt=document.createElement('div'); pt.className='bench-pts'; pt.textContent=pts;
+
+    card.appendChild(num); card.appendChild(jEl); card.appendChild(nm); card.appendChild(mt); card.appendChild(pt);
+    row.appendChild(card);
+
+    // Extra detail item
+    const item=document.createElement('div'); item.className='bench-extra-item';
+    item.innerHTML=`
+      <span class="bex-pos ${pos}">${pos}</span>
+      <span class="bex-name">${pl.web_name} <span style="color:var(--muted);font-size:.65rem">· ${teamShort} · £${(pl.now_cost/10).toFixed(1)}m</span></span>
+      <span class="bex-pts">${pts}pts</span>
+    `;
+    list.appendChild(item);
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  TOOLTIP
+// ═══════════════════════════════════════════════════
+function showTT(pl, pick, teamShort, pos) {
   const isCap = pick?.is_captain;
-  document.getElementById('tt-pos').textContent  = `${pos} · ${CLUBS[pl.team]||'?'} ${isCap ? '· ©CAPTAIN':''}`;
+  document.getElementById('tt-pos').textContent  = `${pos} · ${teamShort}${isCap?' · ©CAPTAIN':''}`;
   document.getElementById('tt-name').textContent = pl.web_name;
   document.getElementById('tt-club').textContent = `${allTeams[pl.team]?.name||''} · £${(pl.now_cost/10).toFixed(1)}m`;
-  document.getElementById('tt-pts').textContent  = pl.event_points ?? 0;
-  document.getElementById('tt-total').textContent= pl.total_points ?? 0;
-  document.getElementById('tt-form').textContent = pl.form ?? '—';
-  document.getElementById('tt-own').textContent  = (pl.selected_by_percent ?? '—') + '%';
-  document.getElementById('playerTooltip').classList.add('show');
+  document.getElementById('tt-gw').textContent   = pl.event_points||0;
+  document.getElementById('tt-tot').textContent  = pl.total_points||0;
+  document.getElementById('tt-form').textContent = pl.form||'—';
+  document.getElementById('tt-own').textContent  = (pl.selected_by_percent||'—')+'%';
+  document.getElementById('tt-jersey-svg').innerHTML = makeJerseySVG(teamShort, pos);
+  document.getElementById('tooltip').classList.add('show');
 }
+function closeTT(e){ if(e.target.id==='tooltip') document.getElementById('tooltip').classList.remove('show'); }
 
-function closeTooltip(e) {
-  if (e.target.id === 'playerTooltip')
-    document.getElementById('playerTooltip').classList.remove('show');
-}
-
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 //  HOT PLAYERS
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
 function sortHot(key, btn) {
-  currentSort = key;
-  document.querySelectorAll('.hot-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.hot-tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
   renderHot(key);
 }
-
 function renderHot(key) {
-  let sorted = [...hotPlayers];
-  if (key === 'form')  sorted.sort((a,b) => b.form - a.form);
-  if (key === 'price') sorted.sort((a,b) => b.priceChange - a.priceChange);
-  if (key === 'own')   sorted.sort((a,b) => b.own - a.own);
-  if (key === 'fdr')   sorted.sort((a,b) => a.fdr - b.fdr);
-
-  const top = sorted.slice(0, 8);
-  const grid = document.getElementById('hotGrid');
-  grid.innerHTML = '';
-  top.forEach((p, i) => {
-    const pcClass = p.priceChange > 0 ? 'up' : p.priceChange < 0 ? 'down' : 'flat';
-    const pcText  = p.priceChange > 0 ? `▲ +£${p.priceChange.toFixed(1)}m` :
-                    p.priceChange < 0 ? `▼ £${p.priceChange.toFixed(1)}m` : '= No change';
-    const fdrClass = `fdr-${Math.min(5,Math.max(1,Math.round(p.fdr)))}`;
-
-    const card = document.createElement('div');
-    card.className = 'hot-card fade-in';
-    card.style.animationDelay = `${i*0.05}s`;
-    card.innerHTML = `
-      <div class="hot-rank">${i+1}</div>
+  let s=[...hotPlayers];
+  if(key==='form')  s.sort((a,b)=>b.form-a.form);
+  if(key==='price') s.sort((a,b)=>b.priceChange-a.priceChange);
+  if(key==='own')   s.sort((a,b)=>b.own-a.own);
+  if(key==='fdr')   s.sort((a,b)=>a.nextFDR-b.nextFDR);
+  const top=s.slice(0,8);
+  const grid=document.getElementById('hotGrid');
+  grid.innerHTML='';
+  top.forEach((p,i)=>{
+    const pcCls = p.priceChange>0?'pc-up':p.priceChange<0?'pc-dn':'pc-fl';
+    const pcTxt = p.priceChange>0?`▲ +£${p.priceChange.toFixed(1)}m`:p.priceChange<0?`▼ £${Math.abs(p.priceChange).toFixed(1)}m`:'= 0';
+    const card=document.createElement('div');
+    card.className='hot-card fade-in'; card.style.animationDelay=`${i*.05}s`;
+    const jerseyHtml=makeJerseySVG(p.team, p.pos);
+    card.innerHTML=`
+      <div class="hot-rank-bg">${i+1}</div>
+      <svg class="hot-jersey-sm" viewBox="0 0 100 80">${jerseyHtml.replace(/<svg[^>]*>/,'').replace('</svg>','')}</svg>
       <span class="hot-pos-tag ${p.pos}">${p.pos}</span>
       <div class="hot-name">${p.name}</div>
-      <div class="hot-club">${p.clubFull || p.club}</div>
+      <div class="hot-club">${p.teamFull||p.team}</div>
       <div class="hot-stats">
-        <div class="hot-stat-row">
-          <span class="hot-stat-key">Form (5GW)</span>
-          <span class="hot-stat-val form">${p.form.toFixed(1)}</span>
-        </div>
-        <div class="hot-stat-row">
-          <span class="hot-stat-key">Price</span>
-          <span class="hot-stat-val price">
-            £${p.price.toFixed(1)}m
-            <span class="price-change ${pcClass}">${pcText}</span>
-          </span>
-        </div>
-        <div class="hot-stat-row">
-          <span class="hot-stat-key">Ownership</span>
-          <span class="hot-stat-val own">${p.own.toFixed(1)}%</span>
-        </div>
-        <div class="hot-stat-row">
-          <span class="hot-stat-key">Next FDR</span>
-          <span class="hot-stat-val">
-            <span class="fdr-pip ${fdrClass}"></span>
-            ${p.fdr === 1 ? 'Very Easy' : p.fdr === 2 ? 'Easy' : p.fdr === 3 ? 'Medium' : p.fdr === 4 ? 'Hard' : 'Very Hard'}
-          </span>
-        </div>
-        <div class="hot-stat-row">
-          <span class="hot-stat-key">GW Points</span>
-          <span class="hot-stat-val" style="color:var(--accent)">${p.gwPts ?? '—'}</span>
-        </div>
-      </div>
-    `;
+        <div class="hot-stat-row"><span class="hot-stat-key">Form</span><span class="hot-stat-val form">${p.form.toFixed(1)}</span></div>
+        <div class="hot-stat-row"><span class="hot-stat-key">Price</span><span class="hot-stat-val price">£${p.price.toFixed(1)}m <span class="${pcCls}">${pcTxt}</span></span></div>
+        <div class="hot-stat-row"><span class="hot-stat-key">Owned</span><span class="hot-stat-val own">${p.own.toFixed(1)}%</span></div>
+        <div class="hot-stat-row"><span class="hot-stat-key">Next FDR</span><span class="hot-stat-val"><span class="fdr-pip fdr-${p.nextFDR}"></span> ${['','Very Easy','Easy','Medium','Hard','Very Hard'][p.nextFDR]||'—'}</span></div>
+        <div class="hot-stat-row"><span class="hot-stat-key">GW Pts</span><span class="hot-stat-val" style="color:var(--accent)">${p.gwPts}</span></div>
+      </div>`;
     grid.appendChild(card);
   });
 }
 
-// ═══════════════════════════════════════════════════════
-//  DEMO MODE (hardcoded for testing without API)
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+//  DEMO MODE
+// ═══════════════════════════════════════════════════
 function loadDemo() {
-  setStatus('ok', '✓ Demo Mode — showing sample data');
-
-  // Fake summary
-  document.getElementById('s-gwpts').textContent = '72';
-  document.getElementById('s-total').textContent = '1,842';
-  document.getElementById('s-rank').textContent  = '87K';
-  document.getElementById('s-gw').textContent    = 'GW28';
-  document.getElementById('s-tv').textContent    = '£103.2m';
-  document.getElementById('s-bank').textContent  = '£1.5m';
-
-  document.getElementById('summaryGrid').style.display = 'grid';
-  document.getElementById('mainGrid').style.display = 'grid';
-  document.getElementById('hotSection').style.display = 'block';
-
-  // Fake pitch
-  document.getElementById('teamName').textContent    = 'DEMO SQUAD';
-  document.getElementById('formationBadge').textContent = '4-3-3';
-  document.getElementById('pitchEmpty').style.display = 'none';
+  setStatus('ok','✓ Demo Mode');
+  document.getElementById('s-gw').textContent   ='43';
+  document.getElementById('s-tot').textContent  ='1,453';
+  document.getElementById('s-rank').textContent ='1012K';
+  document.getElementById('s-gwn').textContent  ='GW26';
+  document.getElementById('s-tv').textContent   ='£99.0m';
+  document.getElementById('s-bank').textContent ='£0.4m';
+  document.getElementById('summaryGrid').style.display='grid';
+  document.getElementById('mainGrid').style.display='grid';
+  document.getElementById('hotSection').style.display='block';
+  document.getElementById('formationDisplay').textContent='3-4-3';
+  document.getElementById('teamNameDisplay').textContent='GANGJA';
+  document.getElementById('pitchEmpty').style.display='none';
 
   const demoSquad = {
-    GKP: [{ name:'Flekken',    pts:6,  price:'£4.5m', cap:false, vc:false }],
-    DEF: [
-      { name:'Alexander-Arnold', pts:14, price:'£7.8m', cap:false, vc:true },
-      { name:'Pedro Porro',      pts:8,  price:'£5.9m', cap:false, vc:false },
-      { name:'Mykolenko',        pts:6,  price:'£4.6m', cap:false, vc:false },
-      { name:'Faes',             pts:4,  price:'£4.4m', cap:false, vc:false },
+    FWD:[
+      {name:'João Pedro', team:'BHA', pts:10, price:'£7.7m', cap:false, vc:false},
+      {name:'Gyökeres',   team:'—',   pts:8,  price:'£8.6m', cap:false, vc:true},
+      {name:'Haaland',    team:'MCI', pts:6,  price:'£14.9m',cap:true,  vc:false},
     ],
-    MID: [
-      { name:'Salah',    pts:22, price:'£13.2m', cap:true,  vc:false },
-      { name:'Palmer',   pts:10, price:'£11.5m', cap:false, vc:false },
-      { name:'Mbeumo',   pts:9,  price:'£7.2m',  cap:false, vc:false },
+    MID:[
+      {name:'Rogers',   team:'LEI', pts:8,  price:'£7.4m', cap:false, vc:false},
+      {name:'Rice',     team:'ARS', pts:6,  price:'£7.6m', cap:false, vc:false},
+      {name:'Enzo',     team:'CHE', pts:4,  price:'£6.9m', cap:false, vc:false},
+      {name:'Anderson', team:'WHU', pts:2,  price:'£5.4m', cap:false, vc:false},
     ],
-    FWD: [
-      { name:'Isak',    pts:12, price:'£8.8m', cap:false, vc:false },
-      { name:'Watkins', pts:8,  price:'£8.4m', cap:false, vc:false },
-      { name:'Jimenez', pts:5,  price:'£5.9m', cap:false, vc:false },
+    DEF:[
+      {name:'Guildford',   team:'BHA', pts:7, price:'£5.3m', cap:false, vc:false},
+      {name:'Van de Ven',  team:'TOT', pts:5, price:'£4.6m', cap:false, vc:false},
+      {name:'J.Timber',   team:'ARS', pts:5, price:'£6.4m', cap:false, vc:false},
+    ],
+    GKP:[
+      {name:'Pickford', team:'EVE', pts:2, price:'£5.6m', cap:false, vc:false},
     ],
   };
 
-  const pitch = document.getElementById('pitchArea');
-  pitch.querySelectorAll('.player-row').forEach(r => r.remove());
+  const pitch=document.getElementById('pitchArea');
+  pitch.querySelectorAll('.player-row').forEach(r=>r.remove());
 
-  ['FWD','MID','DEF','GKP'].forEach(pos => {
-    const row = document.createElement('div');
-    row.className = 'player-row';
-    demoSquad[pos].forEach(p => {
-      const card = document.createElement('div');
-      card.className = `player-card pos-${pos}`;
-      card.innerHTML = `
-        <div class="player-avatar pos-${pos}">
-          ${p.name.split(' ').pop().slice(0,3).toUpperCase()}
-          ${p.cap ? '<span class="badge-c">C</span>'  : ''}
-          ${p.vc  ? '<span class="badge-vc">V</span>' : ''}
-          <span class="player-pts-bubble">${p.cap ? p.pts*2 : p.pts}pts</span>
-        </div>
-        <div class="player-name">${p.name}</div>
-        <div class="player-price">${p.price}</div>
-      `;
+  ['FWD','MID','DEF','GKP'].forEach(pos=>{
+    const row=document.createElement('div'); row.className='player-row';
+    demoSquad[pos].forEach(p=>{
+      const teamShort = p.team === '—' ? 'MCI' : p.team;
+      const card=document.createElement('div'); card.className='player-card';
+      card.onclick=()=>{
+        document.getElementById('tt-pos').textContent=pos+' · '+teamShort;
+        document.getElementById('tt-name').textContent=p.name;
+        document.getElementById('tt-club').textContent=teamShort+' · '+p.price;
+        document.getElementById('tt-gw').textContent=p.pts;
+        document.getElementById('tt-tot').textContent='—';
+        document.getElementById('tt-form').textContent='—';
+        document.getElementById('tt-own').textContent='—';
+        document.getElementById('tt-jersey-svg').innerHTML=makeJerseySVG(teamShort,pos);
+        document.getElementById('tooltip').classList.add('show');
+      };
+      const jw=jerseyElement(teamShort,pos);
+      if(p.cap){const b=document.createElement('div');b.className='badge-cap';b.textContent='C';jw.appendChild(b);}
+      if(p.vc){const b=document.createElement('div');b.className='badge-vc';b.textContent='V';jw.appendChild(b);}
+      const pb=document.createElement('div');pb.className='pts-bubble'+(p.cap?' cap-pts':'');pb.textContent=(p.cap?p.pts*2:p.pts)+'pts';jw.appendChild(pb);
+      card.appendChild(jw);
+      const nm=document.createElement('div');nm.className='player-name-tag';nm.textContent=p.name;
+      const pr=document.createElement('div');pr.className='player-price-tag';pr.textContent=p.price;
+      card.appendChild(nm); card.appendChild(pr);
       row.appendChild(card);
     });
     pitch.appendChild(row);
   });
 
   // Bench
-  const benchData = [
-    { name:'Henderson', pos:'GKP', pts:2, price:'£4.0m' },
-    { name:'Dunk',      pos:'DEF', pts:3, price:'£4.3m' },
-    { name:'Andreas',   pos:'MID', pts:1, price:'£5.2m' },
-    { name:'Wood',      pos:'FWD', pts:6, price:'£5.5m' },
+  const benchData=[
+    {name:'Kelleher',    team:'LIV',pts:2,pos:'GKP',price:'£4.6m'},
+    {name:'Garner',      team:'FUL',pts:2,pos:'MID',price:'£5.2m'},
+    {name:'Mukiele',     team:'MUN',pts:2,pos:'DEF',price:'£4.6m'},
+    {name:'Gudmundsson', team:'BHA',pts:0,pos:'DEF',price:'£3.8m'},
   ];
-  const benchList = document.getElementById('benchList');
-  benchList.innerHTML = '';
-  benchData.forEach((p, i) => {
-    const item = document.createElement('div');
-    item.className = 'bench-item';
-    item.innerHTML = `
-      <div class="bench-num">${i+1}</div>
-      <div class="bench-avatar pos-${p.pos}">${p.name.slice(0,3).toUpperCase()}</div>
-      <div class="bench-info">
-        <div class="bench-name">${p.name}</div>
-        <div class="bench-meta">${p.pos} · ${p.price}</div>
-      </div>
-      <div class="bench-pts">${p.pts}</div>
-    `;
-    benchList.appendChild(item);
+  const row=document.getElementById('benchRow');
+  const list=document.getElementById('benchExtraList');
+  row.innerHTML=''; list.innerHTML='';
+  benchData.forEach((p,i)=>{
+    const card=document.createElement('div'); card.className='bench-card';
+    const num=document.createElement('div');num.className='bench-num';num.textContent=i+1;
+    const jEl=jerseyElement(p.team,p.pos,'bench-jersey');
+    const nm=document.createElement('div');nm.className='bench-name';nm.textContent=p.name;
+    const mt=document.createElement('div');mt.className='bench-meta';mt.textContent=p.pos+' · '+p.team;
+    const pt=document.createElement('div');pt.className='bench-pts';pt.textContent=p.pts;
+    card.appendChild(num);card.appendChild(jEl);card.appendChild(nm);card.appendChild(mt);card.appendChild(pt);
+    row.appendChild(card);
+    const item=document.createElement('div');item.className='bench-extra-item';
+    item.innerHTML=`<span class="bex-pos ${p.pos}">${p.pos}</span><span class="bex-name">${p.name} <span style="color:var(--muted);font-size:.65rem">· ${p.team} · ${p.price}</span></span><span class="bex-pts">${p.pts}pts</span>`;
+    list.appendChild(item);
   });
 
-  // Hot players demo
-  hotPlayers = [
-    { name:'Salah',    fullName:'Mohamed Salah',    club:'LIV', clubFull:'Liverpool',      pos:'MID', form:9.8, price:13.2, priceChange:0.1,  own:72.4, gwPts:22, fdr:2 },
-    { name:'Isak',     fullName:'Alexander Isak',   club:'NEW', clubFull:'Newcastle',      pos:'FWD', form:8.2, price:8.8,  priceChange:0.2,  own:28.1, gwPts:12, fdr:1 },
-    { name:'Palmer',   fullName:'Cole Palmer',      club:'CHE', clubFull:'Chelsea',        pos:'MID', form:7.6, price:11.5, priceChange:0.0,  own:51.3, gwPts:10, fdr:3 },
-    { name:'T-Arnold', fullName:'Trent Alexander-Arnold', club:'LIV', clubFull:'Liverpool',pos:'DEF', form:7.4, price:7.8,  priceChange:-0.1, own:43.2, gwPts:14, fdr:2 },
-    { name:'Mbeumo',   fullName:'Bryan Mbeumo',     club:'BRE', clubFull:'Brentford',     pos:'MID', form:7.0, price:7.2,  priceChange:0.2,  own:22.5, gwPts:9,  fdr:1 },
-    { name:'Watkins',  fullName:'Ollie Watkins',    club:'AVL', clubFull:'Aston Villa',   pos:'FWD', form:6.8, price:8.4,  priceChange:0.0,  own:35.7, gwPts:8,  fdr:2 },
-    { name:'Porro',    fullName:'Pedro Porro',      club:'TOT', clubFull:'Tottenham',     pos:'DEF', form:6.4, price:5.9,  priceChange:0.1,  own:18.9, gwPts:8,  fdr:3 },
-    { name:'Flekken',  fullName:'Mark Flekken',     club:'BRE', clubFull:'Brentford',     pos:'GKP', form:5.8, price:4.5,  priceChange:0.0,  own:12.3, gwPts:6,  fdr:1 },
+  // Demo hot players
+  hotPlayers=[
+    {name:'Salah',    team:'LIV',teamFull:'Liverpool',   pos:'MID',form:9.8,price:13.2,priceChange:.1, own:72.4,gwPts:22,nextFDR:2},
+    {name:'Isak',     team:'NEW',teamFull:'Newcastle',   pos:'FWD',form:8.2,price:8.8, priceChange:.2, own:28.1,gwPts:12,nextFDR:1},
+    {name:'Palmer',   team:'CHE',teamFull:'Chelsea',     pos:'MID',form:7.6,price:11.5,priceChange:0,  own:51.3,gwPts:10,nextFDR:3},
+    {name:'T-Arnold', team:'LIV',teamFull:'Liverpool',   pos:'DEF',form:7.4,price:7.8, priceChange:-.1,own:43.2,gwPts:14,nextFDR:2},
+    {name:'Mbeumo',   team:'BRE',teamFull:'Brentford',   pos:'MID',form:7.0,price:7.2, priceChange:.2, own:22.5,gwPts:9, nextFDR:1},
+    {name:'Watkins',  team:'AVL',teamFull:'Aston Villa', pos:'FWD',form:6.8,price:8.4, priceChange:0,  own:35.7,gwPts:8, nextFDR:2},
+    {name:'Porro',    team:'TOT',teamFull:'Tottenham',   pos:'DEF',form:6.4,price:5.9, priceChange:.1, own:18.9,gwPts:8, nextFDR:3},
+    {name:'Flekken',  team:'BRE',teamFull:'Brentford',   pos:'GKP',form:5.8,price:4.5, priceChange:0,  own:12.3,gwPts:6, nextFDR:1},
   ];
   renderHot('form');
 }
 
-// ═══════════════════════════════════════════════════════
-//  AUTO-LOAD SAVED ID
-// ═══════════════════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem('fplTeamId');
-  if (saved) {
-    document.getElementById('teamIdInput').value = saved;
-    setStatus('idle', `Last loaded Team ID: ${saved} — Click Load Team`);
-  }
-  // Enter key trigger
-  document.getElementById('teamIdInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') loadTeam();
-  });
+// ── Init ─────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',()=>{
+  const saved=localStorage.getItem('fplTeamId');
+  if(saved){ document.getElementById('teamId').value=saved; setStatus('idle',`Last ID: ${saved} — Load Team နှိပ်ပါ`); }
+  document.getElementById('teamId').addEventListener('keydown',e=>{ if(e.key==='Enter') loadTeam(); });
 });
 </script>
 </body>
