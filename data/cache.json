@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-02-18T11:37:53.082Z",
+  "fetchedAt": "2026-02-18T13:03:24.778Z",
   "currentGW": 26,
   "nextDeadline": "2026-02-21T13:30:00Z",
   "team": null,
@@ -291,7 +291,7 @@
       "form": 6.2,
       "price": 4,
       "priceChange": 0.1,
-      "own": 3.2,
+      "own": 3.3,
       "gwPts": 9,
       "totalPts": 59,
       "bonus": 2,
