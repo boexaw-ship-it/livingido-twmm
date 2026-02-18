@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FPL Overlay — OBS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Transparent Base ─────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 1920px;
+      height: 1080px;
+      background: transparent !important;
+      overflow: hidden;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* OBS mode forces full transparency */
+    body.obs-mode { background: rgba(0,0,0,0) !important; }
+
+    :root {
+      --accent:  #00d4aa;
+      --accent2: #3b82f6;
+      --accent3: #f59e0b;
+      --danger:  #ef4444;
+      --purple:  #a855f7;
+      --dark:    rgba(8, 12, 24, 0.92);
+      --darker:  rgba(5, 8, 18, 0.96);
+      --border:  rgba(255,255,255,0.08);
+      --font-h:  'Bebas Neue', sans-serif;
+      --font-m:  'JetBrains Mono', monospace;
+    }
+
+    /* ── Entire overlay sits at bottom ───────────── */
+    #overlay-root {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      pointer-events: none;
+    }
+
+    /* ── Top Info Strip (above main bar) ─────────── */
+    #top-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 0 24px 6px;
+      gap: 12px;
+    }
+
+    /* ── Score Ticker ─────────────────────────────── */
+    .ticker-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: var(--darker);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 10px 10px 0 0;
+      overflow: hidden;
+      height: 38px;
+      flex: 1;
+      max-width: 900px;
+    }
+    .ticker-label {
+      background: var(--accent2);
+      color: white;
+      font-family: var(--font-h);
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      padding: 0 14px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .ticker-track {
+      overflow: hidden;
+      flex: 1;
+      height: 100%;
+      position: relative;
+    }
+    .ticker-inner {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      gap: 0;
+      white-space: nowrap;
+      animation: ticker-scroll 30s linear infinite;
+    }
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 20px;
+      border-right: 1px solid var(--border);
+      height: 100%;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .ticker-score {
+      font-family: var(--font-m);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent3);
+      background: rgba(245,158,11,0.12);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .ticker-score.live { color: var(--danger); background: rgba(239,68,68,0.12); animation: pulse 1.5s infinite; }
+    .ticker-score.ft   { color: var(--accent); background: rgba(0,212,170,0.1); }
+    .ticker-time {
+      font-family: var(--font-m);
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.4);
+    }
+    @keyframes ticker-scroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ── Countdown Widget ─────────────────────────── */
+    .countdown-widget {
+      background: var(--darker);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 10px 10px 0 0;
+      padding: 6px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      height: 38px;
+    }
+    .cd-label {
+      font-family: var(--font-h);
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.4);
+    }
+    .cd-time {
+      font-family: var(--font-m);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent3);
+      letter-spacing: 2px;
+    }
+    .cd-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--danger); animation: pulse 1s infinite; }
+
+    /* ── Main Bottom Bar ──────────────────────────── */
+    #main-bar {
+      background: var(--dark);
+      border-top: 2px solid var(--accent);
+      display: flex;
+      align-items: stretch;
+      height: 80px;
+      gap: 0;
+    }
+
+    /* Dividers between segments */
+    .bar-divider {
+      width: 1px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    /* ── Bar Segment: Brand ───────────────────────── */
+    .seg-brand {
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 10px;
+      flex-shrink: 0;
+      background: rgba(0,212,170,0.06);
+    }
+    .brand-logo {
+      font-family: var(--font-h);
+      font-size: 1.6rem;
+      letter-spacing: 3px;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .brand-logo span { color: white; }
+    .brand-gw {
+      font-family: var(--font-m);
+      font-size: 0.6rem;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 2px;
+    }
+
+    /* ── Bar Segment: My Team ─────────────────────── */
+    .seg-myteam {
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+    .myteam-label {
+      font-family: var(--font-h);
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.35);
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+    }
+    .myteam-stats { display: flex; gap: 14px; align-items: center; }
+    .myteam-stat { text-align: center; }
+    .myteam-val {
+      font-family: var(--font-h);
+      font-size: 1.6rem;
+      letter-spacing: 1px;
+      line-height: 1;
+    }
+    .myteam-val.pts  { color: var(--accent); }
+    .myteam-val.rank { color: var(--accent2); }
+    .myteam-key {
+      font-size: 0.58rem;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-top: 2px;
+    }
+    .myteam-sep { width: 1px; height: 36px; background: var(--border); }
+
+    /* ── Bar Segment: Captain ─────────────────────── */
+    .seg-captain {
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .cap-badge {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: rgba(245,158,11,0.15);
+      border: 2px solid var(--accent3);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-h);
+      font-size: 1.1rem;
+      color: var(--accent3);
+      flex-shrink: 0;
+      position: relative;
+    }
+    .cap-c {
+      position: absolute; top: -4px; right: -4px;
+      width: 16px; height: 16px;
+      background: var(--accent3); color: #000;
+      border-radius: 50%; font-size: 0.6rem; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-h); letter-spacing: 0;
+    }
+    .cap-info { display: flex; flex-direction: column; gap: 2px; }
+    .cap-label { font-size: 0.58rem; color: rgba(255,255,255,0.35); letter-spacing: 2px; text-transform: uppercase; }
+    .cap-name  { font-family: var(--font-h); font-size: 1.1rem; letter-spacing: 1px; line-height: 1; }
+    .cap-pts   { font-family: var(--font-m); font-size: 0.75rem; color: var(--accent3); }
+
+    /* ── Bar Segment: Hot Player ──────────────────── */
+    .seg-hot {
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      gap: 12px;
+      flex-shrink: 0;
+      background: rgba(245,158,11,0.04);
+    }
+    .hot-fire { font-size: 1.4rem; line-height: 1; }
+    .hot-info { display: flex; flex-direction: column; gap: 2px; }
+    .hot-label { font-size: 0.58rem; color: rgba(255,255,255,0.35); letter-spacing: 2px; text-transform: uppercase; }
+    .hot-name  { font-family: var(--font-h); font-size: 1.05rem; letter-spacing: 1px; line-height: 1; }
+    .hot-meta  { display: flex; gap: 6px; align-items: center; }
+    .hot-form  { font-family: var(--font-m); font-size: 0.7rem; color: var(--accent3); }
+    .hot-price { font-family: var(--font-m); font-size: 0.7rem; color: rgba(255,255,255,0.4); }
+
+    /* ── Bar Segment: Prediction ──────────────────── */
+    .seg-predict {
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      gap: 14px;
+      flex: 1;
+    }
+    .pred-label { font-size: 0.58rem; color: rgba(255,255,255,0.35); letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
+    .pred-match {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .pred-team { font-family: var(--font-h); font-size: 1rem; letter-spacing: 1px; color: white; }
+    .pred-score-box {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .pred-score {
+      font-family: var(--font-m);
+      font-size: 1.1rem;
+      font-weight: 700;
+      width: 26px; height: 26px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pred-score.predicted { color: var(--accent2); }
+    .pred-score.actual    { color: var(--accent);  background: rgba(0,212,170,0.12); }
+    .pred-vs { font-family: var(--font-m); font-size: 0.65rem; color: rgba(255,255,255,0.3); }
+    .pred-divider {
+      width: 1px; height: 30px; background: var(--border);
+    }
+    .pred-result {
+      font-family: var(--font-m);
+      font-size: 0.65rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .pred-result.correct { background: rgba(0,212,170,0.15); color: var(--accent); }
+    .pred-result.wrong   { background: rgba(239,68,68,0.15);  color: var(--danger); }
+    .pred-result.pending { background: rgba(245,158,11,0.12); color: var(--accent3); }
+
+    /* ── Bar Segment: Poll ────────────────────────── */
+    .seg-poll {
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      gap: 14px;
+      flex-shrink: 0;
+      background: rgba(168,85,247,0.04);
+    }
+    .poll-info { display: flex; flex-direction: column; gap: 4px; min-width: 160px; }
+    .poll-question { font-size: 0.65rem; color: rgba(255,255,255,0.5); line-height: 1.3; max-width: 160px; }
+    .poll-bars { display: flex; flex-direction: column; gap: 3px; }
+    .poll-row { display: flex; align-items: center; gap: 6px; }
+    .poll-option-label { font-size: 0.6rem; color: rgba(255,255,255,0.4); width: 28px; flex-shrink: 0; }
+    .poll-bar-wrap { flex: 1; height: 6px; background: rgba(255,255,255,0.07); border-radius: 3px; overflow: hidden; }
+    .poll-bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+    .poll-bar-fill.c1 { background: var(--accent2); }
+    .poll-bar-fill.c2 { background: var(--danger); }
+    .poll-bar-fill.c3 { background: var(--accent3); }
+    .poll-pct { font-family: var(--font-m); font-size: 0.62rem; color: rgba(255,255,255,0.5); width: 28px; text-align: right; }
+
+    /* ── Animations ───────────────────────────────── */
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    #overlay-root { animation: slideUp 0.5s ease forwards; }
+
+    /* ── FDR pip ──────────────────────────────────── */
+    .fdr { display: inline-block; width: 8px; height: 8px; border-radius: 2px; }
+    .fdr-1,.fdr-2 { background: #00d4aa; }
+    .fdr-3 { background: #f59e0b; }
+    .fdr-4,.fdr-5 { background: #ef4444; }
+  </style>
+</head>
+<body class="obs-mode">
+
+<div id="overlay-root">
+
+  <!-- ── Top Strip ──────────────────────────────────── -->
+  <div id="top-strip">
+
+    <!-- Score Ticker -->
+    <div class="ticker-wrap">
+      <div class="ticker-label">GW SCORES</div>
+      <div class="ticker-track">
+        <div class="ticker-inner" id="tickerInner">
+          <!-- duplicated for seamless loop -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Countdown -->
+    <div class="countdown-widget" id="countdownWidget">
+      <div class="cd-dot"></div>
+      <div class="cd-label">KICK OFF</div>
+      <div class="cd-time" id="cdTime">--:--:--</div>
+    </div>
+
+  </div>
+
+  <!-- ── Main Bar ────────────────────────────────────── -->
+  <div id="main-bar">
+
+    <!-- Brand -->
+    <div class="seg-brand">
+      <div>
+        <div class="brand-logo">FPL<span>HUB</span></div>
+        <div class="brand-gw" id="gwLabel">GW —</div>
+      </div>
+    </div>
+    <div class="bar-divider"></div>
+
+    <!-- My Team Stats -->
+    <div class="seg-myteam">
+      <div class="myteam-label">MY TEAM</div>
+      <div class="myteam-stats">
+        <div class="myteam-stat">
+          <div class="myteam-val pts" id="ob-pts">—</div>
+          <div class="myteam-key">GW PTS</div>
+        </div>
+        <div class="myteam-sep"></div>
+        <div class="myteam-stat">
+          <div class="myteam-val rank" id="ob-rank">—</div>
+          <div class="myteam-key">RANK</div>
+        </div>
+      </div>
+    </div>
+    <div class="bar-divider"></div>
+
+    <!-- Captain -->
+    <div class="seg-captain">
+      <div class="cap-badge" id="ob-cap-badge">
+        C
+        <span class="cap-c">C</span>
+      </div>
+      <div class="cap-info">
+        <div class="cap-label">Captain</div>
+        <div class="cap-name" id="ob-cap-name">—</div>
+        <div class="cap-pts" id="ob-cap-pts">— pts (×2)</div>
+      </div>
+    </div>
+    <div class="bar-divider"></div>
+
+    <!-- Hot Player -->
+    <div class="seg-hot">
+      <div class="hot-fire">🔥</div>
+      <div class="hot-info">
+        <div class="hot-label">Hot Player</div>
+        <div class="hot-name" id="ob-hot-name">—</div>
+        <div class="hot-meta">
+          <span class="hot-form" id="ob-hot-form">Form —</span>
+          <span class="hot-price" id="ob-hot-price">£—m</span>
+          <span class="fdr" id="ob-hot-fdr"></span>
+        </div>
+      </div>
+    </div>
+    <div class="bar-divider"></div>
+
+    <!-- Prediction vs Actual -->
+    <div class="seg-predict">
+      <div class="pred-label">PREDICTION</div>
+      <div class="pred-match" id="ob-pred-match">
+        <span class="pred-team" id="ob-pred-home">—</span>
+        <div class="pred-score-box">
+          <span class="pred-score predicted" id="ob-pred-hs">?</span>
+          <span class="pred-vs">:</span>
+          <span class="pred-score predicted" id="ob-pred-as">?</span>
+        </div>
+        <span style="font-size:0.6rem;color:rgba(255,255,255,0.2)">vs actual</span>
+        <div class="pred-score-box">
+          <span class="pred-score actual" id="ob-act-hs">?</span>
+          <span class="pred-vs">:</span>
+          <span class="pred-score actual" id="ob-act-as">?</span>
+        </div>
+        <span class="pred-team" id="ob-pred-away">—</span>
+        <div class="pred-divider"></div>
+        <span class="pred-result pending" id="ob-pred-result">LIVE</span>
+      </div>
+    </div>
+    <div class="bar-divider"></div>
+
+    <!-- Poll Results -->
+    <div class="seg-poll">
+      <div class="poll-info">
+        <div class="poll-question" id="ob-poll-q">Who will score first?</div>
+        <div class="poll-bars" id="ob-poll-bars">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-bar -->
+</div><!-- /overlay-root -->
+
+<script>
+// ═══════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════
+const CACHE_URL     = '../data/cache.json';
+const PRED_KEY      = 'fpl_predictions';
+const POLL_KEY      = 'fpl_poll_results';
+const REFRESH_MS    = 60 * 1000;   // re-read cache every 60s
+const TICKER_MS     = 30 * 1000;   // ticker refresh
+
+// Countdown target — update this before stream!
+// Format: 'YYYY-MM-DDTHH:MM:SS' local time
+let KICKOFF_TIME = localStorage.getItem('fpl_kickoff') || null;
+
+// ═══════════════════════════════════════════════════
+//  LOAD CACHE
+// ═══════════════════════════════════════════════════
+async function loadCache() {
+  try {
+    const res  = await fetch(CACHE_URL + '?t=' + Date.now());
+    return await res.json();
+  } catch(e) {
+    console.warn('Cache load failed:', e);
+    return null;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER TEAM STATS
+// ═══════════════════════════════════════════════════
+function renderTeam(cache) {
+  const team = cache?.team;
+  document.getElementById('gwLabel').textContent = `GW ${cache?.currentGW || '—'}`;
+
+  if (!team) return;
+
+  // Points
+  document.getElementById('ob-pts').textContent  = team.gwPoints ?? '—';
+
+  // Rank
+  const rank = team.overallRank;
+  document.getElementById('ob-rank').textContent =
+    rank ? (rank >= 1000 ? Math.round(rank/1000) + 'K' : rank) : '—';
+
+  // Captain
+  const cap = team.starters?.find(p => p.isCaptain);
+  if (cap) {
+    const initials = cap.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('ob-cap-badge').childNodes[0].textContent = initials;
+    document.getElementById('ob-cap-name').textContent = cap.name;
+    document.getElementById('ob-cap-pts').textContent  = `${cap.displayPts} pts (×2)`;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER HOT PLAYER
+// ═══════════════════════════════════════════════════
+function renderHotPlayer(cache) {
+  const top = cache?.topPlayers?.[0];
+  if (!top) return;
+  document.getElementById('ob-hot-name').textContent  = top.name;
+  document.getElementById('ob-hot-form').textContent  = `Form ${top.form}`;
+  document.getElementById('ob-hot-price').textContent = `£${top.price}m`;
+  const fdrEl = document.getElementById('ob-hot-fdr');
+  const fdr = top.nextFDR || 3;
+  fdrEl.className = `fdr fdr-${Math.min(5,fdr)}`;
+  fdrEl.title = top.nextFDRLabel || '';
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER SCORE TICKER
+// ═══════════════════════════════════════════════════
+function renderTicker(cache) {
+  const fixtures = cache?.fixtures || [];
+  if (!fixtures.length) return;
+
+  // Build ticker items HTML (duplicated for seamless loop)
+  const makeItems = () => fixtures.map(f => {
+    const hasScore = f.homeScore !== null && f.awayScore !== null;
+    const isLive   = !f.finished && hasScore;
+    const isFT     = f.finished && hasScore;
+    const time     = f.kickoff ? new Date(f.kickoff).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) : '—';
+
+    let scoreHtml;
+    if (hasScore) {
+      const cls = isLive ? 'live' : 'ft';
+      scoreHtml = `<span class="ticker-score ${cls}">${f.homeScore} - ${f.awayScore}</span>`;
+    } else {
+      scoreHtml = `<span class="ticker-time">${time}</span>`;
+    }
+    return `
+      <div class="ticker-item">
+        <span>${f.homeShort}</span>
+        ${scoreHtml}
+        <span>${f.awayShort}</span>
+      </div>`;
+  }).join('');
+
+  const inner = document.getElementById('tickerInner');
+  const html  = makeItems() + makeItems(); // duplicate for loop
+  inner.innerHTML = html;
+
+  // Adjust animation duration based on content width
+  requestAnimationFrame(() => {
+    const halfW = inner.scrollWidth / 2;
+    const speed = halfW / 60; // px per second
+    inner.style.animationDuration = `${Math.max(20, speed)}s`;
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER PREDICTION vs ACTUAL
+// ═══════════════════════════════════════════════════
+function renderPrediction(cache) {
+  const saved = JSON.parse(localStorage.getItem(PRED_KEY) || '{}');
+  const fixtures = cache?.fixtures || [];
+
+  // Find first in-progress or latest fixture
+  const target =
+    fixtures.find(f => !f.finished && f.homeScore !== null) ||
+    fixtures.find(f => !f.finished) ||
+    fixtures[0];
+
+  if (!target) return;
+
+  const pred = saved[target.id] || {};
+
+  document.getElementById('ob-pred-home').textContent = target.homeShort;
+  document.getElementById('ob-pred-away').textContent = target.awayShort;
+  document.getElementById('ob-pred-hs').textContent   = pred.home ?? '?';
+  document.getElementById('ob-pred-as').textContent   = pred.away ?? '?';
+  document.getElementById('ob-act-hs').textContent    = target.homeScore ?? '?';
+  document.getElementById('ob-act-as').textContent    = target.awayScore ?? '?';
+
+  const resultEl = document.getElementById('ob-pred-result');
+  if (target.finished) {
+    const correct =
+      parseInt(pred.home) === target.homeScore &&
+      parseInt(pred.away) === target.awayScore;
+    resultEl.textContent  = correct ? '✓ CORRECT' : '✗ WRONG';
+    resultEl.className    = `pred-result ${correct ? 'correct' : 'wrong'}`;
+  } else if (target.homeScore !== null) {
+    resultEl.textContent = '● LIVE';
+    resultEl.className   = 'pred-result pending';
+  } else {
+    resultEl.textContent = 'UPCOMING';
+    resultEl.className   = 'pred-result pending';
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER POLL RESULTS
+// ═══════════════════════════════════════════════════
+function renderPoll() {
+  const poll = JSON.parse(localStorage.getItem(POLL_KEY) || 'null');
+  if (!poll) {
+    // Default demo poll
+    renderPollData({
+      question: 'Match Result?',
+      options: ['Home Win', 'Draw', 'Away Win'],
+      votes:   [54, 21, 25],
+    });
+    return;
+  }
+  renderPollData(poll);
+}
+
+function renderPollData(poll) {
+  document.getElementById('ob-poll-q').textContent = poll.question || 'Community Poll';
+  const total  = poll.votes.reduce((a,b) => a+b, 0) || 1;
+  const colors = ['c1','c2','c3'];
+  const barsEl = document.getElementById('ob-poll-bars');
+  barsEl.innerHTML = poll.options.map((opt, i) => {
+    const pct = Math.round((poll.votes[i] / total) * 100);
+    return `
+      <div class="poll-row">
+        <span class="poll-option-label">${opt.slice(0,4).toUpperCase()}</span>
+        <div class="poll-bar-wrap">
+          <div class="poll-bar-fill ${colors[i]}" style="width:${pct}%"></div>
+        </div>
+        <span class="poll-pct">${pct}%</span>
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════
+//  COUNTDOWN TIMER
+// ═══════════════════════════════════════════════════
+function updateCountdown() {
+  const el = document.getElementById('cdTime');
+  const widget = document.getElementById('countdownWidget');
+
+  if (!KICKOFF_TIME) {
+    el.textContent = '--:--:--';
+    return;
+  }
+
+  const target = new Date(KICKOFF_TIME).getTime();
+  const now    = Date.now();
+  const diff   = target - now;
+
+  if (diff <= 0) {
+    el.textContent = 'LIVE NOW';
+    el.style.color = 'var(--danger)';
+    widget.querySelector('.cd-dot').style.display = '';
+    return;
+  }
+
+  widget.querySelector('.cd-dot').style.display = 'none';
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+// ═══════════════════════════════════════════════════
+//  OBS MODE CHECK
+// ═══════════════════════════════════════════════════
+function checkOBSMode() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('obs') === 'true') {
+    document.body.classList.add('obs-mode');
+    document.body.style.background = 'transparent';
+  }
+  // Set kickoff from URL param: ?obs=true&kickoff=2025-03-15T15:00:00
+  const ko = params.get('kickoff');
+  if (ko) {
+    KICKOFF_TIME = ko;
+    localStorage.setItem('fpl_kickoff', ko);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  MAIN INIT & REFRESH LOOP
+// ═══════════════════════════════════════════════════
+async function init() {
+  checkOBSMode();
+
+  // Start countdown tick
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // Initial data load
+  await refresh();
+
+  // Auto-refresh every minute
+  setInterval(refresh, REFRESH_MS);
+
+  // Poll refresh every 10s (localStorage based)
+  setInterval(renderPoll, 10000);
+}
+
+async function refresh() {
+  const cache = await loadCache();
+  if (!cache) return;
+  renderTeam(cache);
+  renderHotPlayer(cache);
+  renderTicker(cache);
+  renderPrediction(cache);
+  renderPoll();
+}
+
+init();
+</script>
+</body>
+</html>
