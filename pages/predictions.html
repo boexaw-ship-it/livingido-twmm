@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Predictions — FPL Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#080c14;--s1:#0e1420;--s2:#131b2e;--s3:#18243d;
+      --bd:#1e2d47;--ac:#00d4aa;--bl:#3b82f6;--am:#f59e0b;
+      --dg:#ef4444;--pu:#a855f7;--tx:#e2e8f0;--mt:#4a5f7a;
+      --fh:'Bebas Neue',sans-serif;
+      --fb:'DM Sans',sans-serif;
+      --fm:'JetBrains Mono',monospace;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--tx);font-family:var(--fb);min-height:100vh}
+    body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+      background-image:repeating-linear-gradient(-45deg,transparent,transparent 40px,rgba(0,212,170,.012) 40px,rgba(0,212,170,.012) 41px)}
+
+    /* ── Navbar ── */
+    nav{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;
+      padding:0 1.5rem;height:58px;background:rgba(8,12,20,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+    .nav-logo{font-family:var(--fh);font-size:1.5rem;color:var(--ac);text-decoration:none;letter-spacing:2px}
+    .nav-logo span{color:var(--tx)}
+    .nav-links{display:flex;gap:.2rem;list-style:none}
+    .nav-links a{padding:.35rem .8rem;border-radius:6px;text-decoration:none;font-size:.8rem;font-weight:600;color:var(--mt);transition:all .2s}
+    .nav-links a:hover{color:var(--tx);background:var(--s2)}
+    .nav-links a.active{color:var(--bl);background:rgba(59,130,246,.1)}
+
+    /* ── Page ── */
+    .page{max-width:1100px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-index:1}
+
+    /* ── Page Header ── */
+    .ph{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1.75rem;gap:1rem;flex-wrap:wrap}
+    .lbl{font-family:var(--fm);font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--mt);margin-bottom:.35rem}
+    .ph-title{font-family:var(--fh);font-size:3.2rem;letter-spacing:3px;line-height:.95}
+    .ph-title span{color:var(--bl)}
+    .gw-tabs{display:flex;gap:.35rem;flex-wrap:wrap}
+    .gw-tab{font-family:var(--fm);font-size:.68rem;letter-spacing:1px;padding:.35rem .9rem;border-radius:6px;border:1px solid var(--bd);background:transparent;color:var(--mt);cursor:pointer;transition:all .2s}
+    .gw-tab:hover{border-color:var(--bl);color:var(--bl)}
+    .gw-tab.active{border-color:var(--bl);color:var(--bl);background:rgba(59,130,246,.1)}
+
+    /* ── Stats Bar ── */
+    .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;margin-bottom:1.75rem}
+    .sbox{background:var(--s2);border:1px solid var(--bd);border-radius:11px;padding:1.1rem;text-align:center;position:relative;overflow:hidden}
+    .sbox::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--sc,var(--ac))}
+    .sval{font-family:var(--fh);font-size:2.2rem;letter-spacing:1px;line-height:1;color:var(--sc,var(--ac))}
+    .skey{font-size:.62rem;color:var(--mt);text-transform:uppercase;letter-spacing:1.5px;margin-top:.25rem}
+    .sbox.bl{--sc:var(--bl)}.sbox.am{--sc:var(--am)}.sbox.dg{--sc:var(--dg)}
+
+    /* ── Fixture Card ── */
+    .fixtures-wrap{display:flex;flex-direction:column;gap:.9rem}
+    .fc{
+      background:var(--s2);border:1px solid var(--bd);border-radius:16px;
+      overflow:hidden;transition:border-color .25s,box-shadow .25s;
+      scroll-margin-top:70px;
+    }
+    .fc:hover{border-color:rgba(59,130,246,.35)}
+    .fc.submitted{border-color:rgba(0,212,170,.3)}
+    .fc.correct{border-color:rgba(0,212,170,.5);box-shadow:0 0 20px rgba(0,212,170,.07)}
+    .fc.wrong{border-color:rgba(239,68,68,.3)}
+
+    /* Card Top — Teams + Score */
+    .fc-top{
+      display:grid;grid-template-columns:1fr auto 1fr;
+      align-items:center;gap:1rem;padding:1.25rem 1.75rem;
+    }
+
+    /* Team Block */
+    .team-blk{display:flex;align-items:center;gap:.85rem}
+    .team-blk.away{flex-direction:row-reverse}
+    .badge-wrap{position:relative;flex-shrink:0}
+    .team-badge{
+      width:56px;height:56px;object-fit:contain;
+      filter:drop-shadow(0 2px 6px rgba(0,0,0,.5));
+      transition:transform .2s;
+    }
+    .fc:hover .team-badge{transform:scale(1.06)}
+    .team-badge-fb{
+      width:56px;height:56px;border-radius:50%;
+      background:var(--s3);border:1.5px solid var(--bd);
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.6rem;
+    }
+    .team-txt{}
+    .team-name{font-size:1rem;font-weight:700;line-height:1.1}
+    .team-short{font-family:var(--fm);font-size:.6rem;color:var(--mt);margin-top:2px}
+    .team-blk.away .team-txt{text-align:right}
+
+    /* Center Score */
+    .fc-center{text-align:center;flex-shrink:0}
+    .live-score{font-family:var(--fh);font-size:2rem;letter-spacing:3px;color:var(--ac);line-height:1}
+    .ft-score{font-family:var(--fh);font-size:2rem;letter-spacing:3px;color:var(--mt);line-height:1}
+    .vs-txt{font-family:var(--fh);font-size:1.3rem;letter-spacing:3px;color:var(--mt);line-height:1}
+    .ko-time{font-family:var(--fm);font-size:.62rem;color:var(--am);display:block;margin-top:4px;letter-spacing:1px}
+    .live-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--dg);font-family:var(--fm);font-size:.58rem;letter-spacing:1px;padding:2px 7px;border-radius:12px;margin-top:4px}
+    .live-dot{width:5px;height:5px;border-radius:50%;background:var(--dg);animation:pulse 1s infinite}
+    .ft-label{font-family:var(--fm);font-size:.58rem;color:var(--mt);letter-spacing:1px;display:block;margin-top:2px}
+
+    /* FDR Row */
+    .fc-fdr{display:flex;align-items:center;gap:.6rem;padding:.5rem 1.75rem;background:rgba(0,0,0,.15);border-top:1px solid rgba(255,255,255,.03)}
+    .fdr-lbl{font-family:var(--fm);font-size:.58rem;color:var(--mt);letter-spacing:1px}
+    .fdr-pip{font-family:var(--fm);font-size:.62rem;padding:2px 7px;border-radius:4px;font-weight:700}
+    .fdr-1,.fdr-2{background:rgba(0,212,170,.15);color:var(--ac)}
+    .fdr-3{background:rgba(245,158,11,.15);color:var(--am)}
+    .fdr-4,.fdr-5{background:rgba(239,68,68,.15);color:var(--dg)}
+
+    /* Prediction Bottom */
+    .fc-bottom{
+      border-top:1px solid var(--bd);padding:1rem 1.75rem;
+      display:flex;align-items:center;gap:1.25rem;
+      background:var(--s1);flex-wrap:wrap;
+    }
+    .pred-lbl{font-size:.68rem;color:var(--mt);letter-spacing:1px;text-transform:uppercase;flex-shrink:0}
+    .score-row{display:flex;align-items:center;gap:.65rem;flex:1}
+    .sinp{
+      width:50px;height:50px;background:var(--s3);border:2px solid var(--bd);border-radius:9px;
+      color:var(--tx);font-family:var(--fh);font-size:1.7rem;letter-spacing:1px;
+      text-align:center;outline:none;transition:border-color .2s,background .2s;
+      -moz-appearance:textfield;
+    }
+    .sinp::-webkit-inner-spin-button,.sinp::-webkit-outer-spin-button{-webkit-appearance:none}
+    .sinp:focus{border-color:var(--bl);background:rgba(59,130,246,.06)}
+    .sinp:disabled{opacity:.5;cursor:not-allowed}
+    .ssep{font-family:var(--fh);font-size:1.7rem;color:var(--mt)}
+    .btn-sub{font-family:var(--fm);font-size:.7rem;letter-spacing:1px;padding:.55rem 1.3rem;border-radius:7px;border:none;cursor:pointer;transition:all .2s;background:var(--bl);color:#fff;font-weight:700}
+    .btn-sub:hover{background:#5b9cf6;transform:translateY(-1px)}
+    .btn-sub:disabled{opacity:.4;cursor:not-allowed;transform:none}
+    .btn-edit{font-family:var(--fm);font-size:.68rem;padding:.45rem .9rem;border-radius:7px;border:1px solid var(--bd);background:transparent;color:var(--mt);cursor:pointer;transition:all .2s}
+    .btn-edit:hover{border-color:var(--am);color:var(--am)}
+
+    /* Result badges */
+    .rbadge{display:inline-flex;align-items:center;gap:5px;font-family:var(--fm);font-size:.68rem;padding:.35rem .9rem;border-radius:7px}
+    .rbadge.correct{background:rgba(0,212,170,.12);color:var(--ac);border:1px solid rgba(0,212,170,.25)}
+    .rbadge.wrong{background:rgba(239,68,68,.12);color:var(--dg);border:1px solid rgba(239,68,68,.25)}
+    .rbadge.pending{background:rgba(245,158,11,.1);color:var(--am);border:1px solid rgba(245,158,11,.2)}
+    .rbadge.exact{background:rgba(168,85,247,.12);color:var(--pu);border:1px solid rgba(168,85,247,.3)}
+
+    /* Actual score */
+    .actual-wrap{display:flex;align-items:center;gap:.5rem;margin-left:auto}
+    .actual-lbl{font-size:.58rem;color:var(--mt);text-transform:uppercase;letter-spacing:1px}
+    .actual-score{font-family:var(--fm);font-size:.9rem;font-weight:700;color:var(--ac)}
+
+    /* ── History ── */
+    .hist-sec{margin-top:2.5rem}
+    .hist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:.7rem;margin-top:.85rem}
+    .hcard{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:.9rem;text-align:center;transition:border-color .2s}
+    .hcard.correct{border-color:rgba(0,212,170,.3)}.hcard.exact{border-color:rgba(168,85,247,.4)}.hcard.wrong{border-color:rgba(239,68,68,.2)}
+    .hcard-badge-wrap{display:flex;align-items:center;justify-content:center;gap:.4rem;margin-bottom:.5rem}
+    .hcard-badge{width:28px;height:28px;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.4))}
+    .hcard-badge-fb{width:28px;height:28px;border-radius:50%;background:var(--s3);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:.75rem}
+    .hcard-vs{font-family:var(--fm);font-size:.52rem;color:var(--mt)}
+    .hcard-gw{font-family:var(--fm);font-size:.58rem;color:var(--mt);letter-spacing:1px;margin-bottom:3px}
+    .hcard-match{font-size:.7rem;font-weight:700;margin-bottom:.35rem;line-height:1.3}
+    .hcard-scores{font-family:var(--fm);font-size:.75rem}
+    .hcard-scores .ps{color:var(--bl)}.hcard-scores .as{color:var(--ac)}
+
+    /* ── Empty ── */
+    .empty{text-align:center;padding:3.5rem 2rem;color:var(--mt);background:var(--s2);border:1px dashed var(--bd);border-radius:14px}
+    .empty-icon{font-size:2.5rem;margin-bottom:.75rem;opacity:.4}
+    .empty-txt{font-family:var(--fh);font-size:1.3rem;letter-spacing:2px}
+
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .fc{animation:fadeUp .3s ease both}
+    .fc:nth-child(1){animation-delay:.04s}.fc:nth-child(2){animation-delay:.08s}
+    .fc:nth-child(3){animation-delay:.12s}.fc:nth-child(4){animation-delay:.16s}
+    .fc:nth-child(5){animation-delay:.20s}.fc:nth-child(6){animation-delay:.24s}
+    .fc:nth-child(7){animation-delay:.28s}.fc:nth-child(8){animation-delay:.32s}
+    .fc:nth-child(9){animation-delay:.36s}.fc:nth-child(10){animation-delay:.40s}
+
+    ::-webkit-scrollbar{width:4px}
+    ::-webkit-scrollbar-track{background:var(--bg)}
+    ::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
+
+    @media(max-width:600px){
+      .stats-bar{grid-template-columns:repeat(2,1fr)}
+      .fc-top{padding:1rem;gap:.6rem}
+      .fc-bottom{padding:.85rem 1rem}
+      .team-badge,.team-badge-fb{width:44px;height:44px}
+      .team-name{font-size:.88rem}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html" class="nav-logo">FPL<span>HUB</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">🏠 Home</a></li>
+    <li><a href="fantasy.html">⚡ Fantasy</a></li>
+    <li><a href="predictions.html" class="active">🎯 Predict</a></li>
+    <li><a href="watchalong.html">📺 Watch Along</a></li>
+    <li><a href="../overlay.html" target="_blank">🎮 OBS</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="ph">
+    <div>
+      <div class="lbl">// match predictions</div>
+      <h1 class="ph-title">PREDICT <span>THE</span><br>SCORES</h1>
+    </div>
+    <div class="gw-tabs" id="gwTabs"></div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="sbox"><div class="sval" id="s-sub">0</div><div class="skey">Submitted</div></div>
+    <div class="sbox bl"><div class="sval" id="s-cor">0</div><div class="skey">Correct Result</div></div>
+    <div class="sbox" style="--sc:var(--pu)"><div class="sval" id="s-ex">0</div><div class="skey">Exact Score</div></div>
+    <div class="sbox am"><div class="sval" id="s-acc">0%</div><div class="skey">Accuracy</div></div>
+  </div>
+
+  <!-- Fixtures -->
+  <div class="fixtures-wrap" id="fixturesWrap"></div>
+
+  <!-- History -->
+  <div class="hist-sec" id="histSec" style="display:none">
+    <div class="lbl">// prediction history</div>
+    <h2 style="font-family:var(--fh);font-size:1.7rem;letter-spacing:2px;margin-bottom:.25rem">PAST <span style="color:var(--bl)">RESULTS</span></h2>
+    <div class="hist-grid" id="histGrid"></div>
+  </div>
+
+</div>
+
+<footer style="border-top:1px solid var(--bd);padding:1.25rem 2rem;text-align:center;font-size:.7rem;color:var(--mt);position:relative;z-index:1">
+  Predictions saved locally · Badge images © Premier League ·
+  <a href="../index.html" style="color:var(--bl);text-decoration:none">← Home</a>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════
+//  BADGE URL helpers
+// ═══════════════════════════════════════════════
+// FPL team ID → file number (2025/26 season — file# = FPL ID)
+const BADGE_FILE = {
+  1:  1,   // Arsenal
+  2:  2,   // Aston Villa
+  3:  3,   // Bournemouth
+  4:  4,   // Brentford
+  5:  5,   // Brighton
+  6:  6,   // Burnley      ← promoted
+  7:  7,   // Chelsea
+  8:  8,   // Crystal Palace
+  9:  9,   // Everton
+  10: 10,  // Fulham
+  11: 11,  // Leeds         ← promoted
+  12: 12,  // Liverpool
+  13: 13,  // Man City
+  14: 14,  // Man United
+  15: 15,  // Newcastle
+  16: 16,  // Nott'm Forest
+  17: 17,  // Sunderland    ← promoted
+  18: 18,  // Tottenham
+  19: 19,  // West Ham
+  20: 20,  // Wolves
+};
+// SVG fallback colors (2025/26)
+const TEAM_COLORS = {
+  1:  {s:'ARS',p:'#EF0107',sec:'#063672'},  // Arsenal
+  2:  {s:'AVL',p:'#670E36',sec:'#95BFE5'},  // Aston Villa
+  3:  {s:'BOU',p:'#DA291C',sec:'#000000'},  // Bournemouth
+  4:  {s:'BRE',p:'#E30613',sec:'#FFFFFF'},  // Brentford
+  5:  {s:'BHA',p:'#0057B8',sec:'#FFCD00'},  // Brighton
+  6:  {s:'BUR',p:'#6C1D45',sec:'#99D6EA'},  // Burnley
+  7:  {s:'CHE',p:'#034694',sec:'#FFFFFF'},  // Chelsea
+  8:  {s:'CRY',p:'#1B458F',sec:'#C4122E'},  // Crystal Palace
+  9:  {s:'EVE',p:'#003399',sec:'#FFFFFF'},  // Everton
+  10: {s:'FUL',p:'#CC0000',sec:'#FFFFFF'},  // Fulham
+  11: {s:'LEE',p:'#FFCD00',sec:'#1D428A'},  // Leeds
+  12: {s:'LIV',p:'#C8102E',sec:'#F6EB61'},  // Liverpool
+  13: {s:'MCI',p:'#6CABDD',sec:'#FFFFFF'},  // Man City
+  14: {s:'MUN',p:'#DA291C',sec:'#FBE122'},  // Man United
+  15: {s:'NEW',p:'#241F20',sec:'#41B6E6'},  // Newcastle
+  16: {s:'NFO',p:'#DD0000',sec:'#FFFFFF'},  // Nott'm Forest
+  17: {s:'SUN',p:'#EB172B',sec:'#000000'},  // Sunderland
+  18: {s:'TOT',p:'#132257',sec:'#FFFFFF'},  // Tottenham
+  19: {s:'WHU',p:'#7A263A',sec:'#1BB1E7'},  // West Ham
+  20: {s:'WOL',p:'#FDB913',sec:'#231F20'},  // Wolves
+};
+
+// team code lookup (FPL team id → PL badge code)
+// These are the official PL team codes used in badge URLs
+const TEAM_BADGE_CODE = {
+  1:3,   // Arsenal
+  2:7,   // Aston Villa
+  3:91,  // Bournemouth
+  4:94,  // Brentford
+  5:36,  // Brighton
+  6:8,   // Chelsea
+  7:31,  // Crystal Palace
+  8:11,  // Everton
+  9:54,  // Fulham
+  10:40, // Ipswich
+  11:13, // Leicester
+  12:14, // Liverpool
+  13:43, // Luton (relegated)
+  14:43, // Man City
+  15:1,  // Man United
+  16:4,  // Newcastle
+  17:17, // Nott'm Forest
+  18:49, // Sheffield Utd (relegated)
+  19:20, // Southampton
+  20:6,  // Tottenham
+  21:21, // West Ham
+  22:39, // Wolves
+};
+
+// Emoji fallback per team id
+const TEAM_EMOJI = {
+  1:'🔴',2:'🟣',3:'🍒',4:'🔴',5:'🔵',6:'🔵',7:'🔴',8:'🔵',
+  9:'⚪',10:'🔵',11:'🔵',12:'🔴',14:'🔵',15:'🔴',16:'⚫',
+  17:'🔴',19:'🔴',20:'⚪',21:'🔴',22:'🟡',
+};
+
+function svgBadge(teamId, size){
+  // SVG shield fallback with team color
+  const tc = TEAM_COLORS[teamId]||{s:'?',p:'#334155',sec:'#94a3b8'};
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('width', size); svg.setAttribute('height', size);
+  svg.setAttribute('viewBox','0 0 100 100');
+  svg.style.flexShrink='0';
+  const fs = Math.round(size * 0.95);
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="g${teamId}s${size}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${tc.p}"/>
+        <stop offset="100%" stop-color="${tc.p}bb"/>
+      </linearGradient>
+    </defs>
+    <path d="M50,4 L90,18 L90,52 Q90,78 50,96 Q10,78 10,52 L10,18 Z"
+          fill="url(#g${teamId}s${size})" stroke="${tc.sec}" stroke-width="2.5" stroke-opacity="0.4"/>
+    <path d="M50,4 L90,18 L90,36 L50,50 L10,36 L10,18 Z"
+          fill="${tc.sec}" opacity="0.15"/>
+    <text x="50" y="62" text-anchor="middle" dominant-baseline="middle"
+          font-family="'Bebas Neue','Arial Narrow',Arial,sans-serif"
+          font-size="${fs}" font-weight="900"
+          fill="${tc.sec}" opacity="0.95" letter-spacing="0.5">${tc.s}</text>`;
+  return svg;
+}
+
+function badgeImg(teamId, size=56, cls='team-badge'){
+  const fileNum = BADGE_FILE[teamId];
+
+  // If we have a logo file → use real PNG
+  if(fileNum){
+    const wrap = document.createElement('div');
+    wrap.style.cssText=`width:${size}px;height:${size}px;flex-shrink:0;display:flex;align-items:center;justify-content:center`;
+
+    const img = document.createElement('img');
+    img.style.cssText=`width:${size}px;height:${size}px;object-fit:contain`;
+    img.alt = '';
+    img.src = `../images/badges/${fileNum}.png`;
+    img.onerror = function(){
+      // PNG failed → show SVG fallback
+      wrap.removeChild(img);
+      wrap.appendChild(svgBadge(teamId, size));
+    };
+    wrap.appendChild(img);
+    return wrap;
+  }
+
+  // No file → SVG shield
+  return svgBadge(teamId, size);
+}
+
+// ═══════════════════════════════════════════════
+//  DATA & STATE
+// ═══════════════════════════════════════════════
+const PRED_KEY  = 'fpl_predictions';
+const CACHE_URL = '../data/cache.json';
+
+// Fixture data with teamId for badge lookup
+const STATIC_FX = {
+  28:[
+    {id:101,gw:28,homeTeam:'Arsenal',    homeShort:'ARS',homeId:1, awayTeam:'Man City',     awayShort:'MCI',awayId:14,kickoff:'2025-03-15T12:30:00',finished:false,homeScore:null,awayScore:null,homeDiff:4,awayDiff:2},
+    {id:102,gw:28,homeTeam:'Liverpool',  homeShort:'LIV',homeId:12,awayTeam:'Chelsea',      awayShort:'CHE',awayId:6, kickoff:'2025-03-15T15:00:00',finished:false,homeScore:null,awayScore:null,homeDiff:3,awayDiff:3},
+    {id:103,gw:28,homeTeam:'Man United', homeShort:'MUN',homeId:15,awayTeam:'Tottenham',    awayShort:'TOT',awayId:20,kickoff:'2025-03-15T17:30:00',finished:false,homeScore:null,awayScore:null,homeDiff:3,awayDiff:2},
+    {id:104,gw:28,homeTeam:'Aston Villa',homeShort:'AVL',homeId:2, awayTeam:'Newcastle',    awayShort:'NEW',awayId:16,kickoff:'2025-03-16T14:00:00',finished:false,homeScore:null,awayScore:null,homeDiff:2,awayDiff:3},
+    {id:105,gw:28,homeTeam:'Brighton',   homeShort:'BHA',homeId:5, awayTeam:'West Ham',     awayShort:'WHU',awayId:21,kickoff:'2025-03-16T16:30:00',finished:false,homeScore:null,awayScore:null,homeDiff:2,awayDiff:4},
+    {id:106,gw:28,homeTeam:'Brentford',  homeShort:'BRE',homeId:4, awayTeam:'Everton',      awayShort:'EVE',awayId:8, kickoff:'2025-03-16T14:00:00',finished:false,homeScore:null,awayScore:null,homeDiff:1,awayDiff:3},
+    {id:107,gw:28,homeTeam:'Wolves',     homeShort:'WOL',homeId:22,awayTeam:'Fulham',       awayShort:'FUL',awayId:9, kickoff:'2025-03-16T14:00:00',finished:false,homeScore:null,awayScore:null,homeDiff:3,awayDiff:2},
+    {id:108,gw:28,homeTeam:'Crystal Palace',homeShort:'CRY',homeId:7,awayTeam:'Leicester', awayShort:'LEI',awayId:11,kickoff:'2025-03-16T14:00:00',finished:false,homeScore:null,awayScore:null,homeDiff:2,awayDiff:4},
+    {id:109,gw:28,homeTeam:'Nott\'m Forest',homeShort:'NFO',homeId:17,awayTeam:'Bournemouth',awayShort:'BOU',awayId:3,kickoff:'2025-03-16T14:00:00',finished:false,homeScore:null,awayScore:null,homeDiff:3,awayDiff:2},
+    {id:110,gw:28,homeTeam:'Southampton',homeShort:'SOU',homeId:19,awayTeam:'Ipswich',      awayShort:'IPS',awayId:10,kickoff:'2025-03-17T20:00:00',finished:false,homeScore:null,awayScore:null,homeDiff:1,awayDiff:1},
+  ],
+  27:[
+    {id:91,gw:27,homeTeam:'Man City',  homeShort:'MCI',homeId:14,awayTeam:'Liverpool',  awayShort:'LIV',awayId:12,kickoff:'2025-03-08T12:30:00',finished:true,homeScore:1,awayScore:2,homeDiff:3,awayDiff:2},
+    {id:92,gw:27,homeTeam:'Chelsea',   homeShort:'CHE',homeId:6, awayTeam:'Arsenal',    awayShort:'ARS',awayId:1, kickoff:'2025-03-08T15:00:00',finished:true,homeScore:0,awayScore:1,homeDiff:3,awayDiff:3},
+    {id:93,gw:27,homeTeam:'Newcastle', homeShort:'NEW',homeId:16,awayTeam:'Man United', awayShort:'MUN',awayId:15,kickoff:'2025-03-09T14:00:00',finished:true,homeScore:3,awayScore:0,homeDiff:2,awayDiff:5},
+  ],
+};
+
+let currentGW   = 28;
+let allFixtures = {...STATIC_FX};
+let predictions = JSON.parse(localStorage.getItem(PRED_KEY)||'{}');
+
+// Load real team codes from FPL API to get accurate badge codes
+async function loadTeamCodes(){
+  try{
+    const PROXIES=['https://corsproxy.io/?','https://api.allorigins.win/raw?url='];
+    const url='https://fantasy.premierleague.com/api/bootstrap-static/';
+    for(const p of PROXIES){
+      try{
+        const r=await fetch(p+encodeURIComponent(url));
+        if(!r.ok) continue;
+        const d=await r.json();
+        // Override TEAM_BADGE_CODE with real API data
+        d.teams.forEach(t=>{
+          TEAM_BADGE_CODE[t.id]=t.code;
+        });
+        console.log('Team codes loaded from FPL API');
+        return;
+      }catch(e){}
+    }
+  }catch(e){ console.log('Using hardcoded team codes'); }
+}
+
+// ═══════════════════════════════════════════════
+//  LOAD CACHE — merge real fixture data if available
+// ═══════════════════════════════════════════════
+async function loadCache(){
+  try{
+    const r=await fetch(CACHE_URL+'?t='+Date.now());
+    const d=await r.json();
+    if(d.fixtures?.length){
+      const grp={};
+      d.fixtures.forEach(f=>{
+        // Map cache fixture to include teamIds from static if available
+        const staticF = Object.values(STATIC_FX).flat().find(sf=>sf.id===f.id);
+        const merged = {...f, homeId:staticF?.homeId||0, awayId:staticF?.awayId||0};
+        if(!grp[f.gw]) grp[f.gw]=[];
+        grp[f.gw].push(merged);
+      });
+      Object.assign(allFixtures, grp);
+      if(d.currentGW) currentGW=d.currentGW;
+    }
+  }catch(e){}
+}
+
+// ═══════════════════════════════════════════════
+//  PREDICTIONS
+// ═══════════════════════════════════════════════
+function savePred(id,h,a){
+  predictions[id]={home:parseInt(h),away:parseInt(a),ts:Date.now()};
+  localStorage.setItem(PRED_KEY,JSON.stringify(predictions));
+}
+function clearPred(id){
+  delete predictions[id];
+  localStorage.setItem(PRED_KEY,JSON.stringify(predictions));
+}
+
+// ═══════════════════════════════════════════════
+//  ACCURACY
+// ═══════════════════════════════════════════════
+function calcAcc(){
+  let sub=0,cor=0,ex=0;
+  Object.values(allFixtures).flat().forEach(f=>{
+    const p=predictions[f.id]; if(!p) return;
+    sub++;
+    if(!f.finished) return;
+    if(Math.sign(p.home-p.away)===Math.sign(f.homeScore-f.awayScore)) cor++;
+    if(p.home===f.homeScore&&p.away===f.awayScore) ex++;
+  });
+  return{sub,cor,ex};
+}
+function updateStats(){
+  const{sub,cor,ex}=calcAcc();
+  document.getElementById('s-sub').textContent=sub;
+  document.getElementById('s-cor').textContent=cor;
+  document.getElementById('s-ex').textContent=ex;
+  document.getElementById('s-acc').textContent=sub>0?Math.round(cor/sub*100)+'%':'0%';
+}
+
+const FDR_LABEL = ['','Very Easy','Easy','Medium','Hard','Very Hard'];
+
+// ═══════════════════════════════════════════════
+//  RENDER FIXTURE CARD
+// ═══════════════════════════════════════════════
+function renderCard(f){
+  const pred    = predictions[f.id];
+  const hasAct  = f.finished && f.homeScore!==null;
+  const isLive  = !f.finished && f.homeScore!==null;
+  const isCorrect = pred&&hasAct&&Math.sign(pred.home-pred.away)===Math.sign(f.homeScore-f.awayScore);
+  const isExact   = pred&&hasAct&&pred.home===f.homeScore&&pred.away===f.awayScore;
+
+  // Badge images
+  const homeBadge = badgeImg(f.homeId||0, 56, 'team-badge');
+  const awayBadge = badgeImg(f.awayId||0, 56, 'team-badge');
+
+  const card=document.createElement('div');
+  card.className='fc'+(pred&&hasAct?(isCorrect?' correct':' wrong'):pred?' submitted':'');
+  card.id=`fc-${f.id}`;
+
+  // KO time
+  const ko=new Date(f.kickoff);
+  const koStr=ko.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})
+            +' · '+ko.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+
+  // Center content
+  let centerHTML='';
+  if(isLive){
+    centerHTML=`<div class="live-score">${f.homeScore} - ${f.awayScore}</div>
+                <div class="live-badge"><span class="live-dot"></span> LIVE</div>`;
+  }else if(hasAct){
+    centerHTML=`<div class="live-score" style="color:var(--ac)">${f.homeScore} - ${f.awayScore}</div>
+                <span class="ft-label">FULL TIME</span>`;
+  }else{
+    centerHTML=`<div class="vs-txt">VS</div><span class="ko-time">${koStr}</span>`;
+  }
+
+  // Result badge
+  let rbHTML='';
+  if(pred&&hasAct){
+    if(isExact) rbHTML=`<span class="rbadge exact">🎯 EXACT!</span>`;
+    else if(isCorrect) rbHTML=`<span class="rbadge correct">✓ CORRECT</span>`;
+    else rbHTML=`<span class="rbadge wrong">✗ WRONG</span>`;
+  }else if(pred&&isLive){
+    rbHTML=`<span class="rbadge pending">● LIVE</span>`;
+  }else if(pred){
+    rbHTML=`<span class="rbadge pending">✓ SAVED</span>`;
+  }
+
+  card.innerHTML=`
+    <div class="fc-top">
+      <div class="team-blk home">
+        <div class="badge-wrap" id="hbadge-${f.id}"></div>
+        <div class="team-txt">
+          <div class="team-name">${f.homeTeam}</div>
+          <div class="team-short">${f.homeShort}</div>
+        </div>
+      </div>
+      <div class="fc-center">${centerHTML}</div>
+      <div class="team-blk away">
+        <div class="badge-wrap" id="abadge-${f.id}"></div>
+        <div class="team-txt">
+          <div class="team-name">${f.awayTeam}</div>
+          <div class="team-short">${f.awayShort}</div>
+        </div>
+      </div>
+    </div>
+    <div class="fc-fdr">
+      <span class="fdr-lbl">FDR:</span>
+      <span class="fdr-pip fdr-${f.homeDiff}">${f.homeShort} ${FDR_LABEL[f.homeDiff]||'—'}</span>
+      <span style="color:var(--mt);font-size:.58rem">vs</span>
+      <span class="fdr-pip fdr-${f.awayDiff}">${f.awayShort} ${FDR_LABEL[f.awayDiff]||'—'}</span>
+    </div>
+    <div class="fc-bottom" id="fcb-${f.id}">
+      <span class="pred-lbl">Your Prediction</span>
+      <div class="score-row">
+        <input type="number" min="0" max="20" class="sinp" id="hi-${f.id}" value="${pred?pred.home:''}" placeholder="0" ${hasAct?'disabled':''} />
+        <span class="ssep">:</span>
+        <input type="number" min="0" max="20" class="sinp" id="ai-${f.id}" value="${pred?pred.away:''}" placeholder="0" ${hasAct?'disabled':''} />
+      </div>
+      ${hasAct
+        ? `${rbHTML}
+           ${pred?`<div class="actual-wrap"><span class="actual-lbl">Predicted:</span><span class="actual-score">${pred.home}-${pred.away}</span></div>`:''}` 
+        : `<button class="btn-sub" id="bsub-${f.id}" onclick="submitPred(${f.id})">${pred?'UPDATE':'SUBMIT →'}</button>
+           ${pred?`<button class="btn-edit" onclick="editPred(${f.id})">Clear</button>`:''}
+           ${rbHTML}`
+      }
+    </div>`;
+
+  // Inject badge images after innerHTML (can't do in innerHTML directly)
+  setTimeout(()=>{
+    const hw=document.getElementById(`hbadge-${f.id}`);
+    const aw=document.getElementById(`abadge-${f.id}`);
+    if(hw) hw.appendChild(badgeImg(f.homeId||0,56,'team-badge'));
+    if(aw) aw.appendChild(badgeImg(f.awayId||0,56,'team-badge'));
+  },0);
+
+  // Enter key
+  card.querySelectorAll('.sinp').forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter')submitPred(f.id);}));
+  return card;
+}
+
+// ═══════════════════════════════════════════════
+//  SUBMIT / EDIT
+// ═══════════════════════════════════════════════
+function submitPred(id){
+  const h=document.getElementById(`hi-${id}`).value;
+  const a=document.getElementById(`ai-${id}`).value;
+  if(h===''||a===''){
+    const btn=document.getElementById(`bsub-${id}`);
+    btn.textContent='Enter both scores!'; btn.style.background='var(--am)';
+    setTimeout(()=>{btn.textContent='SUBMIT →';btn.style.background='';},1500);
+    return;
+  }
+  savePred(id,h,a); renderGW(currentGW); updateStats();
+}
+function editPred(id){ clearPred(id); renderGW(currentGW); updateStats(); }
+
+// ═══════════════════════════════════════════════
+//  RENDER GW
+// ═══════════════════════════════════════════════
+function renderGW(gw){
+  currentGW=gw;
+  const wrap=document.getElementById('fixturesWrap'); wrap.innerHTML='';
+  document.querySelectorAll('.gw-tab').forEach(t=>t.classList.toggle('active',parseInt(t.dataset.gw)===gw));
+  const fxs=allFixtures[gw]||[];
+  if(!fxs.length){
+    wrap.innerHTML=`<div class="empty"><div class="empty-icon">📭</div><div class="empty-txt">NO FIXTURES FOR GW${gw}</div></div>`;
+    return;
+  }
+  fxs.forEach(f=>wrap.appendChild(renderCard(f)));
+  const hash=window.location.hash;
+  if(hash){const el=document.querySelector(hash);if(el)setTimeout(()=>el.scrollIntoView({behavior:'smooth'}),300);}
+  renderHistory();
+}
+
+// ═══════════════════════════════════════════════
+//  HISTORY
+// ═══════════════════════════════════════════════
+function renderHistory(){
+  const past=[];
+  Object.values(allFixtures).flat().forEach(f=>{
+    const p=predictions[f.id]; if(!p||!f.finished) return;
+    const isC=Math.sign(p.home-p.away)===Math.sign(f.homeScore-f.awayScore);
+    const isE=p.home===f.homeScore&&p.away===f.awayScore;
+    past.push({f,p,isC,isE});
+  });
+  const sec=document.getElementById('histSec');
+  const grid=document.getElementById('histGrid');
+  if(!past.length){sec.style.display='none';return;}
+  sec.style.display='block';
+
+  grid.innerHTML='';
+  past.reverse().forEach(({f,p,isC,isE})=>{
+    const card=document.createElement('div');
+    card.className=`hcard ${isE?'exact':isC?'correct':'wrong'}`;
+
+    // Badges
+    const hBadge=badgeImg(f.homeId||0,28,'hcard-badge');
+    const aBadge=badgeImg(f.awayId||0,28,'hcard-badge');
+    const bwrap=document.createElement('div'); bwrap.className='hcard-badge-wrap';
+    bwrap.appendChild(hBadge);
+    const vsEl=document.createElement('span'); vsEl.className='hcard-vs'; vsEl.textContent='vs';
+    bwrap.appendChild(vsEl);
+    bwrap.appendChild(aBadge);
+    card.appendChild(bwrap);
+
+    card.innerHTML+=`
+      <div class="hcard-gw">GW${f.gw}</div>
+      <div class="hcard-match">${f.homeShort} vs ${f.awayShort}</div>
+      <div class="hcard-scores"><span class="ps">${p.home}-${p.away}</span> / <span class="as">${f.homeScore}-${f.awayScore}</span></div>
+      <div style="margin-top:.4rem">
+        ${isE?'<span class="rbadge exact" style="font-size:.55rem;padding:1px 6px">🎯</span>':isC?'<span class="rbadge correct" style="font-size:.55rem;padding:1px 6px">✓</span>':'<span class="rbadge wrong" style="font-size:.55rem;padding:1px 6px">✗</span>'}
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  GW TABS
+// ═══════════════════════════════════════════════
+function buildTabs(){
+  const gws=Object.keys(allFixtures).map(Number).sort((a,b)=>b-a);
+  const tabs=document.getElementById('gwTabs');
+  tabs.innerHTML=gws.map(g=>`<button class="gw-tab ${g===currentGW?'active':''}" data-gw="${g}" onclick="renderGW(${g})">GW${g}</button>`).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+async function init(){
+  await loadTeamCodes(); // get real badge codes
+  await loadCache();
+  buildTabs();
+  renderGW(currentGW);
+  updateStats();
+}
+init();
+</script>
+</body>
+</html>
