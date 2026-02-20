@@ -1,0 +1,27 @@
+{
+  "match": {
+    "homeTeam": "Home",
+    "awayTeam": "Away",
+    "homeScore": 0,
+    "awayScore": 0,
+    "homeId": 0,
+    "awayId": 0,
+    "matchState": "live",
+    "gw": 26,
+    "kickoff": null
+  },
+  "poll": {
+    "question": "Community Poll",
+    "options": [
+      "Home",
+      "Away",
+      "Draw"
+    ],
+    "votes": [
+      0,
+      0,
+      0
+    ]
+  },
+  "updatedAt": "2026-02-20T04:12:14.695Z"
+}
