@@ -1,13 +1,13 @@
 {
   "match": {
-    "homeTeam": "Home",
-    "awayTeam": "Away",
+    "homeTeam": "Cheasea",
+    "awayTeam": "Burnley",
     "homeScore": 0,
     "awayScore": 0,
     "homeId": 0,
     "awayId": 0,
-    "matchState": "live",
-    "gw": 26,
+    "matchState": "pre",
+    "gw": 28,
     "kickoff": null
   },
   "poll": {
@@ -23,5 +23,5 @@
       0
     ]
   },
-  "updatedAt": "2026-02-20T04:55:04.550Z"
+  "updatedAt": "2026-02-21T03:38:54.568Z"
 }
