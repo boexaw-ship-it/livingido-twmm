@@ -3,7 +3,7 @@
     "homeTeam": "Home",
     "awayTeam": "Away",
     "homeScore": 2,
-    "awayScore": 0,
+    "awayScore": 1,
     "homeId": 0,
     "awayId": 0,
     "matchState": "pre",
@@ -23,5 +23,5 @@
       1
     ]
   },
-  "updatedAt": "2026-02-21T03:58:06.170Z"
+  "updatedAt": "2026-02-21T03:58:12.320Z"
 }
