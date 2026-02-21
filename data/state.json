@@ -7,7 +7,7 @@
     "homeId": 0,
     "awayId": 0,
     "matchState": "pre",
-    "gw": 28,
+    "gw": 26,
     "kickoff": null
   },
   "poll": {
@@ -18,10 +18,10 @@
       "Draw"
     ],
     "votes": [
-      0,
+      1,
       0,
       0
     ]
   },
-  "updatedAt": "2026-02-21T03:46:45.380Z"
+  "updatedAt": "2026-02-21T03:58:04.279Z"
 }
