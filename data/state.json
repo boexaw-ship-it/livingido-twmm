@@ -6,7 +6,7 @@
     "awayScore": 1,
     "homeId": 0,
     "awayId": 0,
-    "matchState": "pre",
+    "matchState": "live",
     "gw": 26,
     "kickoff": null
   },
@@ -23,5 +23,5 @@
       1
     ]
   },
-  "updatedAt": "2026-02-21T03:58:12.320Z"
+  "updatedAt": "2026-02-21T03:58:16.215Z"
 }
