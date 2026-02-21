@@ -2,7 +2,7 @@
   "match": {
     "homeTeam": "Home",
     "awayTeam": "Away",
-    "homeScore": 1,
+    "homeScore": 2,
     "awayScore": 0,
     "homeId": 0,
     "awayId": 0,
@@ -23,5 +23,5 @@
       0
     ]
   },
-  "updatedAt": "2026-02-21T03:45:27.774Z"
+  "updatedAt": "2026-02-21T03:46:45.380Z"
 }
