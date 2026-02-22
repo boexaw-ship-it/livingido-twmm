@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>FPL Hub — Podcast Overlay</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#07090e;
+      --ac:#00e5b4;--bl:#4f8ef7;--am:#ffb83f;--dg:#ff4d6d;
+      --tx:#dde6f5;--mt:#3d556e;--mt2:#5a7a96;
+      --bd:#1e2d42;
+      --fh:'Bebas Neue',sans-serif;
+      --fc:'Barlow Condensed',sans-serif;
+      --fm:'JetBrains Mono',monospace;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--tx);font-family:var(--fc)}
+
+    /* ═══════════════════════════
+       MAIN FRAME — 1920x1080
+    ═══════════════════════════ */
+    .frame{
+      width:1920px;height:1080px;
+      display:grid;
+      grid-template-columns:1fr 520px;
+      position:relative;overflow:hidden;
+    }
+
+    /* BG effects */
+    .frame::before{
+      content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+      background-image:
+        linear-gradient(rgba(0,229,180,.015) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(0,229,180,.015) 1px,transparent 1px);
+      background-size:80px 80px;
+    }
+    /* Ambient glow right panel */
+    .frame::after{
+      content:'';position:absolute;top:0;right:0;width:600px;height:100%;pointer-events:none;z-index:0;
+      background:radial-gradient(ellipse 80% 60% at 80% 40%,rgba(0,229,180,.06),transparent);
+    }
+
+    /* ── VIDEO AREA (LEFT) ── */
+    .video-area{
+      position:relative;z-index:1;
+      background:#000;
+      display:flex;align-items:center;justify-content:center;
+      overflow:hidden;
+    }
+    /* Diagonal cut on right edge */
+    .video-area::after{
+      content:'';position:absolute;top:0;right:-1px;width:60px;height:100%;
+      background:linear-gradient(to bottom right,transparent 49%,var(--bg) 51%);
+      z-index:2;
+    }
+    .video-placeholder{
+      display:flex;flex-direction:column;align-items:center;gap:1rem;
+      opacity:.15;pointer-events:none;
+    }
+    .video-placeholder .vp-icon{font-size:5rem}
+    .video-placeholder .vp-txt{font-family:var(--fm);font-size:.8rem;letter-spacing:3px;color:var(--mt2)}
+
+    /* Top edge bar on video */
+    .video-topbar{
+      position:absolute;top:0;left:0;right:0;height:6px;z-index:3;
+      background:linear-gradient(90deg,var(--ac),var(--bl),transparent);
+    }
+    /* Bottom bar */
+    .video-botbar{
+      position:absolute;bottom:0;left:0;right:50px;height:4px;z-index:3;
+      background:linear-gradient(90deg,var(--ac) 0%,var(--bl) 40%,transparent 100%);
+    }
+
+    /* Lower third overlay on video */
+    .lower-third{
+      position:absolute;bottom:0;left:0;right:50px;z-index:4;
+      padding:0 2.5rem 1.8rem;
+    }
+    .lt-bar{
+      display:inline-flex;align-items:center;gap:1rem;
+      background:linear-gradient(90deg,rgba(7,9,14,.92) 70%,rgba(7,9,14,0));
+      padding:.6rem 2rem .6rem 1.2rem;
+      border-left:3px solid var(--ac);
+      clip-path:polygon(0 0,100% 0,96% 100%,0 100%);
+    }
+    .lt-name{font-family:var(--fh);font-size:2.2rem;letter-spacing:3px;color:var(--tx)}
+    .lt-role{font-family:var(--fm);font-size:.65rem;color:var(--ac);letter-spacing:2px;margin-top:.1rem}
+    .lt-divider{width:1px;height:36px;background:rgba(255,255,255,.15)}
+
+    /* ── GRAPHICS PANEL (RIGHT) ── */
+    .graphics{
+      position:relative;z-index:2;
+      background:linear-gradient(160deg,#0a0f1a 0%,#07090e 60%);
+      border-left:1px solid var(--bd);
+      display:flex;flex-direction:column;
+      overflow:hidden;
+      padding:0;
+    }
+
+    /* Top accent line */
+    .graphics::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:3px;
+      background:linear-gradient(90deg,var(--ac),var(--bl));z-index:1;
+    }
+
+    /* Subtle vertical grid lines */
+    .graphics::after{
+      content:'';position:absolute;inset:0;pointer-events:none;
+      background-image:repeating-linear-gradient(0deg,transparent,transparent 79px,rgba(255,255,255,.02) 80px);
+    }
+
+    /* LOGO SECTION */
+    .logo-section{
+      position:relative;z-index:2;
+      padding:2.5rem 2rem 1.5rem;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      flex-shrink:0;
+    }
+    .logo-wrap{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}
+    .logo-icon{
+      width:56px;height:56px;border-radius:12px;
+      background:linear-gradient(135deg,var(--ac),var(--bl));
+      display:flex;align-items:center;justify-content:center;
+      font-family:var(--fh);font-size:1.4rem;color:#000;letter-spacing:2px;
+      flex-shrink:0;box-shadow:0 0 20px rgba(0,229,180,.3);
+    }
+    .logo-text{}
+    .logo-main{font-family:var(--fh);font-size:2rem;letter-spacing:5px;line-height:1;
+      background:linear-gradient(90deg,var(--ac),var(--bl));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .logo-sub{font-family:var(--fm);font-size:.5rem;color:var(--mt2);letter-spacing:3px;margin-top:.1rem}
+
+    .show-name{font-family:var(--fh);font-size:1.4rem;letter-spacing:3px;color:var(--tx);line-height:1;margin-bottom:.35rem}
+    .show-tagline{font-family:var(--fm);font-size:.52rem;color:var(--mt2);letter-spacing:2px}
+
+    /* LIVE STATUS */
+    .live-strip{
+      position:relative;z-index:2;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:.75rem 2rem;
+      background:rgba(255,77,109,.06);
+      border-bottom:1px solid rgba(255,77,109,.15);
+      border-top:1px solid rgba(255,77,109,.1);
+      flex-shrink:0;
+    }
+    .live-badge{
+      display:flex;align-items:center;gap:.5rem;
+      font-family:var(--fm);font-size:.7rem;font-weight:700;letter-spacing:2px;color:var(--dg);
+    }
+    .live-dot{width:8px;height:8px;border-radius:50%;background:var(--dg);animation:pulse 1.5s infinite;flex-shrink:0}
+    .live-clock{font-family:var(--fh);font-size:1.4rem;letter-spacing:3px;color:var(--tx)}
+
+    /* EPISODE INFO */
+    .ep-section{
+      position:relative;z-index:2;
+      padding:1.5rem 2rem;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      flex-shrink:0;
+    }
+    .ep-row{display:flex;gap:1rem;margin-bottom:.85rem}
+    .ep-item{flex:1;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:8px;
+      padding:.65rem .85rem;display:flex;flex-direction:column;gap:.2rem}
+    .ep-val{font-family:var(--fh);font-size:1.5rem;letter-spacing:2px;color:var(--ac);line-height:1}
+    .ep-key{font-family:var(--fm);font-size:.46rem;color:var(--mt2);letter-spacing:2px}
+    .ep-topic{background:rgba(0,229,180,.04);border:1px solid rgba(0,229,180,.12);border-radius:8px;padding:.7rem 1rem}
+    .ep-topic-lbl{font-family:var(--fm);font-size:.46rem;color:var(--mt2);letter-spacing:2px;margin-bottom:.3rem}
+    .ep-topic-txt{font-family:var(--fc);font-size:.95rem;font-weight:700;color:var(--tx);line-height:1.3}
+
+    /* HOSTS SECTION */
+    .hosts-section{
+      position:relative;z-index:2;
+      padding:1.25rem 2rem;
+      flex:1;overflow:hidden;
+    }
+    .hosts-lbl{font-family:var(--fm);font-size:.5rem;color:var(--mt2);letter-spacing:3px;
+      display:flex;align-items:center;gap:.5rem;margin-bottom:.85rem}
+    .hosts-lbl::after{content:'';flex:1;height:1px;background:var(--bd)}
+    .host-item{
+      display:flex;align-items:center;gap:.85rem;
+      padding:.55rem .75rem;border-radius:8px;margin-bottom:.4rem;
+      background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);
+      transition:border-color .3s;
+    }
+    .host-item.active{background:rgba(0,229,180,.04);border-color:rgba(0,229,180,.15)}
+    .host-avatar{
+      width:40px;height:40px;border-radius:8px;flex-shrink:0;
+      background:linear-gradient(135deg,var(--bd),var(--mt));
+      display:flex;align-items:center;justify-content:center;
+      font-family:var(--fh);font-size:1.1rem;color:var(--mt2);
+      border:1px solid var(--bd);position:relative;overflow:hidden;
+    }
+    .host-avatar.green{background:linear-gradient(135deg,rgba(0,229,180,.2),rgba(0,229,180,.05));color:var(--ac);border-color:rgba(0,229,180,.2)}
+    .host-avatar.blue{background:linear-gradient(135deg,rgba(79,142,247,.2),rgba(79,142,247,.05));color:var(--bl);border-color:rgba(79,142,247,.2)}
+    .host-avatar.amber{background:linear-gradient(135deg,rgba(255,184,63,.2),rgba(255,184,63,.05));color:var(--am);border-color:rgba(255,184,63,.2)}
+    .host-avatar img{width:100%;height:100%;object-fit:cover;display:none}
+    .host-avatar.has-img .initials{display:none}
+    .host-avatar.has-img img{display:block}
+    .host-info{}
+    .host-name{font-family:var(--fh);font-size:1.1rem;letter-spacing:1px;color:var(--tx);line-height:1}
+    .host-role{font-family:var(--fm);font-size:.46rem;color:var(--mt2);letter-spacing:1.5px;margin-top:.1rem}
+
+    /* BOTTOM BAR */
+    .bottom-bar{
+      position:absolute;bottom:0;left:0;right:0;z-index:5;
+      height:52px;
+      background:linear-gradient(90deg,rgba(7,9,14,.0),rgba(7,9,14,.95) 20%);
+      display:flex;align-items:center;justify-content:flex-end;padding:0 2rem;
+      border-top:1px solid var(--bd);
+    }
+    .bb-social{display:flex;align-items:center;gap:.6rem;font-family:var(--fm);font-size:.52rem;color:var(--mt2);letter-spacing:1px}
+    .bb-tag{color:var(--ac)}
+
+    /* TICKER at very bottom of video */
+    .ticker-wrap{
+      position:absolute;bottom:0;left:0;right:50px;height:38px;z-index:5;
+      background:linear-gradient(90deg,var(--ac),var(--bl));
+      overflow:hidden;display:flex;align-items:center;
+    }
+    .ticker-lbl{
+      font-family:var(--fh);font-size:.9rem;letter-spacing:3px;color:#000;
+      padding:0 1.2rem;background:rgba(0,0,0,.2);height:100%;display:flex;align-items:center;flex-shrink:0;
+    }
+    .ticker-track{display:flex;gap:3rem;animation:tick 30s linear infinite;white-space:nowrap}
+    .ticker-item{font-family:var(--fc);font-size:.85rem;font-weight:700;color:#000;letter-spacing:1px}
+    .ticker-sep{color:rgba(0,0,0,.4);font-size:.7rem}
+
+    /* CONTROL OVERLAY (hidden in stream) */
+    #ctrlPanel{
+      position:fixed;bottom:0;left:0;right:0;z-index:999;
+      background:rgba(6,9,15,.97);border-top:1px solid var(--bd);
+      padding:.75rem 1.5rem;
+      display:flex;gap:1rem;align-items:flex-end;flex-wrap:wrap;
+      transform:translateY(0);transition:transform .3s;
+    }
+    #ctrlPanel.hidden{transform:translateY(100%)}
+    .ctrl-toggle{
+      position:fixed;bottom:1rem;right:1rem;z-index:1000;
+      font-family:var(--fm);font-size:.6rem;padding:.4rem .8rem;border-radius:6px;
+      background:rgba(0,229,180,.15);color:var(--ac);border:1px solid rgba(0,229,180,.25);
+      cursor:pointer;transition:all .2s;letter-spacing:1px;
+    }
+    .ctrl-toggle:hover{background:var(--ac);color:#000}
+    .cg{display:flex;flex-direction:column;gap:.25rem;min-width:130px}
+    .cl{font-family:var(--fm);font-size:.46rem;color:var(--mt2);letter-spacing:1px}
+    .ci{background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:4px;
+      padding:.28rem .5rem;color:var(--tx);font-family:var(--fc);font-size:.72rem;font-weight:600;outline:none;width:100%}
+    .ci:focus{border-color:var(--ac)}
+    .ci::placeholder{color:var(--mt);font-weight:400;font-size:.65rem}
+    .cbtn{font-family:var(--fm);font-size:.56rem;padding:.28rem .7rem;border-radius:4px;border:none;
+      background:rgba(0,229,180,.1);color:var(--ac);border:1px solid rgba(0,229,180,.18);cursor:pointer;transition:all .2s;letter-spacing:1px;white-space:nowrap;align-self:flex-end}
+    .cbtn:hover{background:var(--ac);color:#000}
+    .cbtn.red{background:rgba(255,77,109,.1);color:var(--dg);border-color:rgba(255,77,109,.2)}.cbtn.red:hover{background:var(--dg);color:#fff}
+
+    /* Host rows in ctrl */
+    .host-ctrl{display:flex;gap:.4rem;align-items:flex-end;flex-wrap:wrap}
+
+    #toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%);z-index:2000;
+      font-family:var(--fm);font-size:.62rem;padding:.35rem .9rem;border-radius:5px;
+      background:var(--ac);color:#000;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;letter-spacing:1px}
+
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    @keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadeIn .5s ease forwards}
+  </style>
+</head>
+<body>
+
+<div class="frame">
+
+  <!-- ══ VIDEO AREA (LEFT) ══ -->
+  <div class="video-area">
+    <div class="video-topbar"></div>
+    <div class="video-placeholder">
+      <div class="vp-icon">🎙</div>
+      <div class="vp-txt">VIDEO SOURCE</div>
+      <div style="font-family:var(--fm);font-size:.55rem;color:var(--mt);letter-spacing:2px;margin-top:.5rem">OBS: Zoom / StreamYard / Webcam</div>
+    </div>
+    <!-- Lower Third -->
+    <div class="lower-third" id="lowerThird">
+      <div class="lt-bar" id="ltBar">
+        <div>
+          <div class="lt-name" id="ltName">HOST NAME</div>
+          <div class="lt-role" id="ltRole">FPL Analyst</div>
+        </div>
+        <div class="lt-divider"></div>
+        <div style="font-family:var(--fm);font-size:.58rem;color:var(--mt2);letter-spacing:1px" id="ltExtra">fplhub.com</div>
+      </div>
+    </div>
+    <div class="video-botbar"></div>
+    <!-- TICKER -->
+    <div class="ticker-wrap">
+      <div class="ticker-lbl">📻 FPL HUB</div>
+      <div style="overflow:hidden;flex:1;height:100%;display:flex;align-items:center">
+        <div class="ticker-track" id="tickerTrack">
+          <!-- filled by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GRAPHICS PANEL (RIGHT) ══ -->
+  <div class="graphics">
+
+    <!-- LOGO -->
+    <div class="logo-section fade-in">
+      <div class="logo-wrap">
+        <div class="logo-icon">FPL</div>
+        <div class="logo-text">
+          <div class="logo-main">FPL HUB</div>
+          <div class="logo-sub">FANTASY PREMIER LEAGUE PODCAST</div>
+        </div>
+      </div>
+      <div class="show-name" id="showName">THE WEEKLY POD</div>
+      <div class="show-tagline" id="showTagline">Fantasy. Football. Every Week.</div>
+    </div>
+
+    <!-- LIVE STATUS -->
+    <div class="live-strip">
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        <span>YOUTUBE LIVE</span>
+      </div>
+      <div class="live-clock" id="liveClock">--:--:--</div>
+    </div>
+
+    <!-- EPISODE INFO -->
+    <div class="ep-section fade-in">
+      <div class="ep-row">
+        <div class="ep-item">
+          <div class="ep-val" id="epGW">GW28</div>
+          <div class="ep-key">GAMEWEEK</div>
+        </div>
+        <div class="ep-item">
+          <div class="ep-val" id="epNum">EP.12</div>
+          <div class="ep-key">EPISODE</div>
+        </div>
+        <div class="ep-item">
+          <div class="ep-val" id="epDate">SAT</div>
+          <div class="ep-key">DATE</div>
+        </div>
+      </div>
+      <div class="ep-topic">
+        <div class="ep-topic-lbl">NOW DISCUSSING</div>
+        <div class="ep-topic-txt" id="epTopic">Transfer Tips & Captaincy Picks</div>
+      </div>
+    </div>
+
+    <!-- HOSTS -->
+    <div class="hosts-section fade-in">
+      <div class="hosts-lbl">HOSTS & GUESTS</div>
+      <div id="hostsWrap">
+        <div class="host-item active" id="h0">
+          <div class="host-avatar green"><span class="initials" id="h0init">H</span><img id="h0img" src="" alt=""/></div>
+          <div class="host-info"><div class="host-name" id="h0name">Host Name</div><div class="host-role" id="h0role">Main Host</div></div>
+        </div>
+        <div class="host-item" id="h1">
+          <div class="host-avatar blue"><span class="initials" id="h1init">G</span><img id="h1img" src="" alt=""/></div>
+          <div class="host-info"><div class="host-name" id="h1name">Guest Name</div><div class="host-role" id="h1role">Co-Host</div></div>
+        </div>
+        <div class="host-item" id="h2" style="display:none">
+          <div class="host-avatar amber"><span class="initials" id="h2init">G</span><img id="h2img" src="" alt=""/></div>
+          <div class="host-info"><div class="host-name" id="h2name">Guest 2</div><div class="host-role" id="h2role">Guest</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM BAR -->
+    <div class="bottom-bar">
+      <div class="bb-social">
+        <span>📺</span><span class="bb-tag" id="bbYT">@FPLHub</span>
+        <span style="color:var(--bd)">|</span>
+        <span>🌐</span><span id="bbWeb">fplhub.com</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CONTROLS (Hidden during stream — OBS crop) -->
+<button class="ctrl-toggle" onclick="toggleCtrl()" id="ctrlBtn">⚙ CONTROLS</button>
+
+<div id="ctrlPanel">
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;width:100%">
+
+    <!-- SHOW INFO -->
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+      <div class="cg"><div class="cl">SHOW NAME</div><input class="ci" id="ciShow" placeholder="THE WEEKLY POD" style="width:160px"/></div>
+      <div class="cg"><div class="cl">TAGLINE</div><input class="ci" id="ciTag" placeholder="Fantasy. Football..." style="width:160px"/></div>
+      <div class="cg"><div class="cl">GAMEWEEK</div><input class="ci" id="ciGW" placeholder="GW28" style="width:75px"/></div>
+      <div class="cg"><div class="cl">EPISODE</div><input class="ci" id="ciEp" placeholder="EP.12" style="width:65px"/></div>
+      <div class="cg"><div class="cl">TOPIC</div><input class="ci" id="ciTopic" placeholder="Transfer Tips..." style="width:200px"/></div>
+      <div class="cg"><div class="cl">YOUTUBE</div><input class="ci" id="ciYT" placeholder="@FPLHub" style="width:100px"/></div>
+      <div class="cg"><div class="cl">WEBSITE</div><input class="ci" id="ciWeb" placeholder="fplhub.com" style="width:110px"/></div>
+      <button class="cbtn" onclick="applyShow()" style="margin-bottom:0">✓ APPLY</button>
+    </div>
+
+    <!-- HOSTS -->
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;padding-top:.5rem;border-top:1px solid var(--bd);width:100%">
+      <div class="host-ctrl">
+        <div class="cg"><div class="cl">HOST 1 NAME</div><input class="ci" id="h0n" placeholder="Host Name" style="width:120px"/></div>
+        <div class="cg"><div class="cl">ROLE</div><input class="ci" id="h0r" placeholder="Main Host" style="width:100px"/></div>
+        <button class="cbtn" onclick="applyHost(0)">✓ H1</button>
+      </div>
+      <div class="host-ctrl">
+        <div class="cg"><div class="cl">HOST 2 NAME</div><input class="ci" id="h1n" placeholder="Guest Name" style="width:120px"/></div>
+        <div class="cg"><div class="cl">ROLE</div><input class="ci" id="h1r" placeholder="Co-Host" style="width:100px"/></div>
+        <button class="cbtn" onclick="applyHost(1)">✓ H2</button>
+      </div>
+      <div class="host-ctrl">
+        <div class="cg"><div class="cl">HOST 3 NAME</div><input class="ci" id="h2n" placeholder="Guest 3" style="width:120px"/></div>
+        <div class="cg"><div class="cl">ROLE</div><input class="ci" id="h2r" placeholder="Guest" style="width:100px"/></div>
+        <button class="cbtn" onclick="applyHost(2)">✓ H3</button>
+        <button class="cbtn" onclick="toggleH3()" id="h3tog">+ SHOW H3</button>
+      </div>
+    </div>
+
+    <!-- LOWER THIRD + TOPIC + TICKER -->
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;padding-top:.5rem;border-top:1px solid var(--bd);width:100%">
+      <div class="cg"><div class="cl">LOWER THIRD NAME</div><input class="ci" id="ltN" placeholder="Speaker name" style="width:150px"/></div>
+      <div class="cg"><div class="cl">ROLE / TITLE</div><input class="ci" id="ltR" placeholder="FPL Analyst" style="width:130px"/></div>
+      <button class="cbtn" onclick="applyLT()">✓ LOWER THIRD</button>
+      <button class="cbtn" onclick="hideLT()">HIDE</button>
+      <div style="width:100%;display:flex;gap:.5rem;flex-wrap:wrap">
+        <div class="cg" style="flex:1"><div class="cl">TICKER TEXT (separate with |)</div>
+          <input class="ci" id="ciTicker" placeholder="GW28 Tips | Captain Picks | Transfer Advice | Top Differentials" style="width:100%"/></div>
+        <button class="cbtn" onclick="applyTicker()">✓ TICKER</button>
+        <div style="display:flex;gap:.35rem;align-items:flex-end">
+          <button class="cbtn" onclick="highlightHost(0)">● H1 SPEAKING</button>
+          <button class="cbtn" onclick="highlightHost(1)">● H2 SPEAKING</button>
+          <button class="cbtn" onclick="highlightHost(2)">● H3 SPEAKING</button>
+          <button class="cbtn red" onclick="clearHL()">✕ CLEAR</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const ST='fpl_overlay_v1';
+let S=JSON.parse(localStorage.getItem(ST)||'{}');
+let h3Visible=S.h3||false;
+let ctrlHidden=false;
+
+// Clock
+setInterval(()=>{
+  const n=new Date();
+  document.getElementById('liveClock').textContent=n.toLocaleTimeString('en-GB');
+  document.getElementById('epDate').textContent=n.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}).toUpperCase();
+},1000);
+
+// Controls toggle
+function toggleCtrl(){
+  ctrlHidden=!ctrlHidden;
+  document.getElementById('ctrlPanel').classList.toggle('hidden',ctrlHidden);
+  document.getElementById('ctrlBtn').textContent=ctrlHidden?'⚙ SHOW CTRL':'⚙ CONTROLS';
+}
+
+// Apply show info
+function applyShow(){
+  const show=document.getElementById('ciShow').value.trim();
+  const tag=document.getElementById('ciTag').value.trim();
+  const gw=document.getElementById('ciGW').value.trim();
+  const ep=document.getElementById('ciEp').value.trim();
+  const topic=document.getElementById('ciTopic').value.trim();
+  const yt=document.getElementById('ciYT').value.trim();
+  const web=document.getElementById('ciWeb').value.trim();
+  if(show) document.getElementById('showName').textContent=show;
+  if(tag)  document.getElementById('showTagline').textContent=tag;
+  if(gw)   document.getElementById('epGW').textContent=gw;
+  if(ep)   document.getElementById('epNum').textContent=ep;
+  if(topic)document.getElementById('epTopic').textContent=topic;
+  if(yt)   document.getElementById('bbYT').textContent=yt;
+  if(web)  document.getElementById('bbWeb').textContent=web;
+  saveS();toast('✓ Applied!');
+}
+
+// Apply host
+const COLS=['green','blue','amber'];
+function applyHost(idx){
+  const nm=document.getElementById('h'+idx+'n').value.trim();
+  const rl=document.getElementById('h'+idx+'r').value.trim();
+  if(nm){
+    document.getElementById('h'+idx+'name').textContent=nm;
+    document.getElementById('h'+idx+'init').textContent=nm.charAt(0).toUpperCase();
+  }
+  if(rl) document.getElementById('h'+idx+'role').textContent=rl;
+  // Update lower third if this host is active
+  const lt=document.getElementById('ltN');
+  if(!lt.value&&nm){lt.value=nm;}
+  saveS();toast('✓ Host '+(idx+1)+' updated');
+}
+
+// Toggle H3
+function toggleH3(){
+  h3Visible=!h3Visible;
+  document.getElementById('h2').style.display=h3Visible?'flex':'none';
+  document.getElementById('h3tog').textContent=h3Visible?'- HIDE H3':'+ SHOW H3';
+  saveS();
+}
+
+// Highlight speaking host
+function highlightHost(idx){
+  [0,1,2].forEach(i=>{
+    const el=document.getElementById('h'+i);
+    if(el) el.className='host-item'+(i===idx?' active':'');
+  });
+  // Update lower third
+  const nm=document.getElementById('h'+idx+'n').value||document.getElementById('h'+idx+'name').textContent;
+  const rl=document.getElementById('h'+idx+'r').value||document.getElementById('h'+idx+'role').textContent;
+  document.getElementById('ltName').textContent=nm;
+  document.getElementById('ltRole').textContent=rl;
+  document.getElementById('lowerThird').style.opacity='1';
+}
+function clearHL(){
+  [0,1,2].forEach(i=>{const el=document.getElementById('h'+i);if(el)el.className='host-item';});
+}
+
+// Lower third
+function applyLT(){
+  const nm=document.getElementById('ltN').value.trim();
+  const rl=document.getElementById('ltR').value.trim();
+  if(nm) document.getElementById('ltName').textContent=nm;
+  if(rl) document.getElementById('ltRole').textContent=rl;
+  document.getElementById('lowerThird').style.opacity='1';
+  toast('Lower third updated');
+}
+function hideLT(){
+  document.getElementById('lowerThird').style.opacity='0';
+}
+
+// Ticker
+function applyTicker(){
+  const raw=document.getElementById('ciTicker').value.trim();
+  if(!raw)return;
+  const items=raw.split('|').map(s=>s.trim()).filter(Boolean);
+  buildTicker(items);
+  saveS();toast('✓ Ticker updated');
+}
+function buildTicker(items){
+  // Duplicate for seamless loop
+  const all=[...items,...items];
+  const html=all.map(item=>`<span class="ticker-item">${item}</span><span class="ticker-sep">◆</span>`).join('');
+  document.getElementById('tickerTrack').innerHTML=html;
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',1800);
+}
+
+function saveS(){
+  localStorage.setItem(ST,JSON.stringify({h3:h3Visible}));
+}
+
+// Default ticker
+buildTicker(['GW28 Tips & Transfers','Captain Picks','Differential Targets','Price Changes Watch','FPL Hub Podcast — Every Week']);
+
+// Init restore
+function init(){
+  if(h3Visible){document.getElementById('h2').style.display='flex';document.getElementById('h3tog').textContent='- HIDE H3';}
+}
+init();
+</script>
+</body>
+</html>
