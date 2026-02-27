@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-02-27T20:27:17.492Z",
+  "fetchedAt": "2026-02-27T21:28:40.077Z",
   "currentGW": 28,
   "nextDeadline": "2026-03-03T18:00:00Z",
   "team": null,
@@ -5355,7 +5355,7 @@
       "awayTeam": "Aston Villa",
       "awayShort": "AVL",
       "awayId": 2,
-      "homeScore": 0,
+      "homeScore": 1,
       "awayScore": 0,
       "homeDiff": 3,
       "awayDiff": 2,
