@@ -1,7 +1,7 @@
 {
-  "fetchedAt": "2026-03-03T17:43:14.894Z",
-  "currentGW": 28,
-  "nextDeadline": "2026-03-03T18:00:00Z",
+  "fetchedAt": "2026-03-03T18:46:44.818Z",
+  "currentGW": 29,
+  "nextDeadline": "2026-03-14T13:30:00Z",
   "team": null,
   "topPlayers": [
     {
@@ -14,9 +14,9 @@
       "teamId": 13,
       "form": 9.5,
       "price": 5.1,
-      "priceChange": 0.1,
+      "priceChange": 0,
       "own": 9.6,
-      "gwPts": 6,
+      "gwPts": 0,
       "totalPts": 123,
       "bonus": 6,
       "goals": 4,
@@ -25,7 +25,7 @@
       "minutes": 2040,
       "nextFDR": 2,
       "nextFDRLabel": "Easy",
-      "nextOpp": "NFO"
+      "nextOpp": "@WHU"
     },
     {
       "id": 235,
@@ -39,16 +39,16 @@
       "price": 10.6,
       "priceChange": 0,
       "own": 16,
-      "gwPts": 1,
+      "gwPts": 0,
       "totalPts": 83,
       "bonus": 7,
       "goals": 8,
       "assists": 2,
       "cleanSheets": 3,
       "minutes": 1152,
-      "nextFDR": 4,
-      "nextFDRLabel": "Hard",
-      "nextOpp": "@AVL"
+      "nextFDR": 3,
+      "nextFDRLabel": "Medium",
+      "nextOpp": "NEW"
     },
     {
       "id": 373,
@@ -60,18 +60,18 @@
       "teamId": 12,
       "form": 8.8,
       "price": 6.1,
-      "priceChange": 0.1,
+      "priceChange": 0,
       "own": 32.3,
-      "gwPts": 7,
+      "gwPts": 0,
       "totalPts": 129,
       "bonus": 9,
       "goals": 3,
       "assists": 1,
       "cleanSheets": 9,
       "minutes": 2520,
-      "nextFDR": 2,
-      "nextFDRLabel": "Easy",
-      "nextOpp": "@WOL"
+      "nextFDR": 3,
+      "nextFDRLabel": "Medium",
+      "nextOpp": "TOT"
     },
     {
       "id": 324,
@@ -85,16 +85,16 @@
       "price": 6.3,
       "priceChange": 0,
       "own": 2,
-      "gwPts": 10,
+      "gwPts": 0,
       "totalPts": 89,
       "bonus": 13,
       "goals": 4,
       "assists": 3,
       "cleanSheets": 3,
       "minutes": 1862,
-      "nextFDR": 2,
-      "nextFDRLabel": "Easy",
-      "nextOpp": "WHU"
+      "nextFDR": 3,
+      "nextFDRLabel": "Medium",
+      "nextOpp": "@NFO"
     },
     {
       "id": 253,
@@ -108,16 +108,16 @@
       "price": 5,
       "priceChange": 0,
       "own": 7.7,
-      "gwPts": 3,
+      "gwPts": 0,
       "totalPts": 112,
       "bonus": 7,
       "goals": 0,
       "assists": 0,
       "cleanSheets": 10,
       "minutes": 2520,
-      "nextFDR": 3,
-      "nextFDRLabel": "Medium",
-      "nextOpp": "@TOT"
+      "nextFDR": 2,
+      "nextFDRLabel": "Easy",
+      "nextOpp": "LEE"
     },
     {
       "id": 82,
@@ -129,9 +129,9 @@
       "teamId": 13,
       "form": 7,
       "price": 8.2,
-      "priceChange": 0.1,
+      "priceChange": 0,
       "own": 56.3,
-      "gwPts": 8,
+      "gwPts": 0,
       "totalPts": 165,
       "bonus": 17,
       "goals": 14,
@@ -140,7 +140,7 @@
       "minutes": 2426,
       "nextFDR": 2,
       "nextFDRLabel": "Easy",
-      "nextOpp": "NFO"
+      "nextOpp": "@WHU"
     },
     {
       "id": 249,
@@ -152,18 +152,18 @@
       "teamId": 7,
       "form": 6.8,
       "price": 7.6,
-      "priceChange": -0.1,
+      "priceChange": 0,
       "own": 45.2,
-      "gwPts": 2,
+      "gwPts": 0,
       "totalPts": 141,
       "bonus": 25,
       "goals": 11,
       "assists": 8,
       "cleanSheets": 10,
       "minutes": 2056,
-      "nextFDR": 4,
-      "nextFDRLabel": "Hard",
-      "nextOpp": "@AVL"
+      "nextFDR": 3,
+      "nextFDRLabel": "Medium",
+      "nextOpp": "NEW"
     },
     {
       "id": 386,
@@ -177,16 +177,16 @@
       "price": 6.2,
       "priceChange": 0,
       "own": 2.1,
-      "gwPts": 9,
+      "gwPts": 0,
       "totalPts": 74,
       "bonus": 5,
       "goals": 2,
       "assists": 2,
       "cleanSheets": 7,
       "minutes": 1906,
-      "nextFDR": 2,
-      "nextFDRLabel": "Easy",
-      "nextOpp": "@WOL"
+      "nextFDR": 3,
+      "nextFDRLabel": "Medium",
+      "nextOpp": "TOT"
     },
     {
       "id": 449,
@@ -198,18 +198,18 @@
       "teamId": 14,
       "form": 6.8,
       "price": 10,
-      "priceChange": 0.1,
+      "priceChange": 0,
       "own": 39.7,
-      "gwPts": 13,
+      "gwPts": 0,
       "totalPts": 158,
       "bonus": 28,
       "goals": 7,
       "assists": 13,
       "cleanSheets": 4,
       "minutes": 2165,
-      "nextFDR": 4,
-      "nextFDRLabel": "Hard",
-      "nextOpp": "@NEW"
+      "nextFDR": 3,
+      "nextFDRLabel": "Medium",
+      "nextOpp": "AVL"
     },
     {
       "id": 603,
@@ -223,16 +223,16 @@
       "price": 4,
       "priceChange": 0,
       "own": 2,
-      "gwPts": 3,
+      "gwPts": 0,
       "totalPts": 73,
       "bonus": 3,
       "goals": 0,
       "assists": 6,
       "cleanSheets": 5,
       "minutes": 1823,
-      "nextFDR": 3,
-      "nextFDRLabel": "Medium",
-      "nextOpp": "@FUL"
+      "nextFDR": 4,
+      "nextFDRLabel": "Hard",
+      "nextOpp": "MCI"
     },
     {
       "id": 242,
@@ -246,16 +246,16 @@
       "price": 5,
       "priceChange": 0,
       "own": 4.7,
-      "gwPts": 6,
+      "gwPts": 0,
       "totalPts": 103,
       "bonus": 13,
       "goals": 5,
       "assists": 5,
       "cleanSheets": 6,
       "minutes": 1738,
-      "nextFDR": 1,
-      "nextFDRLabel": "Very Easy",
-      "nextOpp": "BUR"
+      "nextFDR": 5,
+      "nextFDRLabel": "Very Hard",
+      "nextOpp": "@ARS"
     },
     {
       "id": 681,
@@ -267,18 +267,18 @@
       "teamId": 14,
       "form": 6.2,
       "price": 7.3,
-      "priceChange": 0.1,
+      "priceChange": 0,
       "own": 5.6,
-      "gwPts": 8,
+      "gwPts": 0,
       "totalPts": 87,
       "bonus": 17,
       "goals": 8,
       "assists": 2,
       "cleanSheets": 1,
       "minutes": 1205,
-      "nextFDR": 4,
-      "nextFDRLabel": "Hard",
-      "nextOpp": "@NEW"
+      "nextFDR": 3,
+      "nextFDRLabel": "Medium",
+      "nextOpp": "AVL"
     },
     {
       "id": 666,
@@ -292,7 +292,7 @@
       "price": 8.8,
       "priceChange": 0,
       "own": 12.4,
-      "gwPts": 2,
+      "gwPts": 0,
       "totalPts": 93,
       "bonus": 11,
       "goals": 10,
@@ -301,7 +301,7 @@
       "minutes": 1801,
       "nextFDR": 3,
       "nextFDRLabel": "Medium",
-      "nextOpp": "@BHA"
+      "nextOpp": "EVE"
     },
     {
       "id": 77,
@@ -315,16 +315,16 @@
       "price": 4.1,
       "priceChange": 0,
       "own": 7,
-      "gwPts": 2,
+      "gwPts": 0,
       "totalPts": 67,
       "bonus": 2,
       "goals": 0,
       "assists": 3,
       "cleanSheets": 4,
       "minutes": 1202,
-      "nextFDR": 3,
-      "nextFDRLabel": "Medium",
-      "nextOpp": "BRE"
+      "nextFDR": 2,
+      "nextFDRLabel": "Easy",
+      "nextOpp": "@BUR"
     },
     {
       "id": 329,
@@ -336,18 +336,18 @@
       "teamId": 10,
       "form": 6,
       "price": 6,
-      "priceChange": 0.1,
+      "priceChange": 0,
       "own": 23.7,
-      "gwPts": 12,
+      "gwPts": 0,
       "totalPts": 140,
       "bonus": 19,
       "goals": 9,
       "assists": 8,
       "cleanSheets": 6,
       "minutes": 2086,
-      "nextFDR": 2,
-      "nextFDRLabel": "Easy",
-      "nextOpp": "WHU"
+      "nextFDR": 3,
+      "nextFDRLabel": "Medium",
+      "nextOpp": "@NFO"
     },
     {
       "id": 402,
@@ -361,7 +361,7 @@
       "price": 5.7,
       "priceChange": 0,
       "own": 4.4,
-      "gwPts": 11,
+      "gwPts": 0,
       "totalPts": 39,
       "bonus": 7,
       "goals": 0,
@@ -370,7 +370,7 @@
       "minutes": 643,
       "nextFDR": 2,
       "nextFDRLabel": "Easy",
-      "nextOpp": "NFO"
+      "nextOpp": "@WHU"
     },
     {
       "id": 21,
@@ -382,9 +382,9 @@
       "teamId": 1,
       "form": 5.6,
       "price": 7.5,
-      "priceChange": -0.1,
+      "priceChange": 0,
       "own": 30.5,
-      "gwPts": 5,
+      "gwPts": 0,
       "totalPts": 157,
       "bonus": 21,
       "goals": 4,
@@ -393,7 +393,7 @@
       "minutes": 2400,
       "nextFDR": 3,
       "nextFDRLabel": "Medium",
-      "nextOpp": "@BHA"
+      "nextOpp": "EVE"
     },
     {
       "id": 169,
@@ -407,7 +407,7 @@
       "price": 4.9,
       "priceChange": 0,
       "own": 0.2,
-      "gwPts": 9,
+      "gwPts": 0,
       "totalPts": 78,
       "bonus": 9,
       "goals": 5,
@@ -416,7 +416,7 @@
       "minutes": 1672,
       "nextFDR": 4,
       "nextFDRLabel": "Hard",
-      "nextOpp": "ARS"
+      "nextOpp": "@SUN"
     },
     {
       "id": 430,
@@ -428,7 +428,7 @@
       "teamId": 13,
       "form": 5.5,
       "price": 14.7,
-      "priceChange": -0.1,
+      "priceChange": 0,
       "own": 62.1,
       "gwPts": 0,
       "totalPts": 193,
@@ -439,7 +439,7 @@
       "minutes": 2233,
       "nextFDR": 2,
       "nextFDRLabel": "Easy",
-      "nextOpp": "NFO"
+      "nextOpp": "@WHU"
     },
     {
       "id": 119,
@@ -453,16 +453,16 @@
       "price": 8.7,
       "priceChange": 0,
       "own": 23.8,
-      "gwPts": 2,
+      "gwPts": 0,
       "totalPts": 117,
       "bonus": 15,
       "goals": 9,
       "assists": 3,
       "cleanSheets": 5,
       "minutes": 1971,
-      "nextFDR": 4,
-      "nextFDRLabel": "Hard",
-      "nextOpp": "@NEW"
+      "nextFDR": 3,
+      "nextFDRLabel": "Medium",
+      "nextOpp": "AVL"
     }
   ],
   "fixtures": [
